@@ -10,15 +10,15 @@ export class Clarification extends Model {
     clarification_responses: { type: 'has_many' as const, foreignKey: 'clarification_id' },
   };
 
-  @text('workspace_id') workspaceId: string;
-  @text('proposer_id') proposerId: string;
-  @text('topic') topic: string;
-  @text('assumptions') assumptions: string; // JSON string of assumptions array
-  @text('status') status: string; // 'pending', 'agreed', 'needs_discussion', 'cancelled'
-  @field('is_synced') isSynced: boolean;
-  @text('clarification_uuid') clarificationUUID: string;
-  @field('created_at') createdAt: number;
-  @field('updated_at') updatedAt: number;
+  @text('workspace_id') workspaceId!: string;
+  @text('proposer_id') proposerId!: string;
+  @text('topic') topic!: string;
+  @text('assumptions') assumptions!: string; // JSON string of assumptions array
+  @text('status') status!: string; // 'pending', 'agreed', 'needs_discussion', 'cancelled'
+  @field('is_synced') isSynced!: boolean;
+  @text('clarification_uuid') clarificationUUID!: string;
+  @field('created_at') createdAt!: number;
+  @field('updated_at') updatedAt!: number;
 
   @children('clarification_responses') responses: any;
 
