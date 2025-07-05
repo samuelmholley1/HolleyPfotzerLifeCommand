@@ -9,6 +9,9 @@ import { database } from './db/index';
 import { cryptoManager } from './crypto.secure';
 import { logger } from './logging';
 import { Q } from '@nozbe/watermelondb';
+import { Event } from './db/Event'; // Correct import path for Event model
+import { Task } from './db/Task'; // Correct import for Task model
+import { Workspace } from './db/Workspace'; // Import Workspace model
 
 export interface ExportOptions {
   includeEvents?: boolean;
@@ -84,7 +87,7 @@ class DataExportService {
         
         // Decrypt events for export
         const decryptedEvents = [];
-        for (const event of events) {
+        for (const event of events as import('./db/Event').Event[]) { // Explicit type cast for build safety
           try {
             const decryptedData = await cryptoManager.decryptEvent(event.encryptedPayload);
             decryptedEvents.push({
@@ -121,8 +124,8 @@ class DataExportService {
         }
 
         const tasks = await tasksQuery.fetch();
-        
-        const exportedTasks = tasks.map(task => ({
+        // Type cast to Task[] for property access
+        const exportedTasks = (tasks as Task[]).map(task => ({
           id: task.id,
           title: task.title,
           description: task.description,
@@ -149,7 +152,8 @@ class DataExportService {
         const workspacesCollection = database.collections.get('workspaces');
         const workspaces = await workspacesCollection.query().fetch();
         
-        const exportedWorkspaces = workspaces.map(workspace => ({
+        // Type cast to Workspace[] for property access
+        const exportedWorkspaces = (workspaces as Workspace[]).map(workspace => ({
           id: workspace.id,
           name: workspace.name,
           type: workspace.type,
@@ -254,11 +258,11 @@ class DataExportService {
         if (parsedData.events && Array.isArray(parsedData.events)) {
           const eventsCollection = database.collections.get('events');
           for (const eventData of parsedData.events) {
+            const encryptedPayload = eventData.data ? await cryptoManager.encryptEvent(eventData.data) || '' : '';
             await eventsCollection.create((event: any) => {
               event.eventType = eventData.eventType;
               event.timestamp = new Date(eventData.timestamp).getTime();
-              event.encryptedPayload = eventData.data ? 
-                await cryptoManager.encryptEvent(eventData.data) || '' : '';
+              event.encryptedPayload = encryptedPayload;
               event.workspaceId = eventData.workspaceId;
               event.isSynced = false; // Re-sync after import
             });
@@ -408,7 +412,8 @@ class DataExportService {
       let newestEvent: Date | undefined;
 
       if (events.length > 0) {
-        const timestamps = events.map(e => new Date(e.timestamp));
+        // Type cast to Event[] for property access
+        const timestamps = (events as Event[]).map(e => new Date(e.timestamp));
         oldestEvent = new Date(Math.min(...timestamps.map(d => d.getTime())));
         newestEvent = new Date(Math.max(...timestamps.map(d => d.getTime())));
       }
