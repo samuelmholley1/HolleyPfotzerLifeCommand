@@ -1,31 +1,34 @@
 // React Native Web polyfill for components
-import React from 'react';
-import { CSSProperties } from 'react';
+import React, { CSSProperties, ReactNode, FC } from 'react';
 
 // Basic style type
 type Style = CSSProperties;
 
 // View component (maps to div)
-export const View: React.FC<{ style?: Style; children?: React.ReactNode; [key: string]: any }> = ({ 
-  style, 
-  children, 
-  ...props 
-}) => (
-  <div style={style} {...props}>
-    {children}
-  </div>
-);
+export const View: FC<{ style?: CSSProperties; children?: ReactNode; [key: string]: any }> = ({
+  style,
+  children,
+  ...props
+}) => {
+  return (
+    <div style={style} {...props}>
+      {children}
+    </div>
+  );
+};
 
 // Text component (maps to span/p)
 export const Text: React.FC<{ style?: Style; children?: React.ReactNode; [key: string]: any }> = ({ 
   style, 
   children, 
   ...props 
-}) => (
-  <span style={style} {...props}>
-    {children}
-  </span>
-);
+}) => {
+  return (
+    <span style={style} {...props}>
+      {children}
+    </span>
+  );
+};
 
 // TouchableOpacity component (maps to button)
 export const TouchableOpacity: React.FC<{ 
