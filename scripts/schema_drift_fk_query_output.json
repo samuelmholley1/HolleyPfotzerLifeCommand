@@ -1,0 +1,16 @@
+[
+  {"source_table": "capacity_status", "source_column": "workspace_id", "target_table": "workspaces", "target_column": "id"},
+  {"source_table": "clarification_responses", "source_column": "clarification_id", "target_table": "clarifications", "target_column": "id"},
+  {"source_table": "clarifications", "source_column": "workspace_id", "target_table": "workspaces", "target_column": "id"},
+  {"source_table": "communication_events", "source_column": "workspace_id", "target_table": "workspaces", "target_column": "id"},
+  {"source_table": "communication_modes", "source_column": "workspace_id", "target_table": "workspaces", "target_column": "id"},
+  {"source_table": "debug_loops", "source_column": "workspace_id", "target_table": "workspaces", "target_column": "id"},
+  {"source_table": "goals", "source_column": "parent_goal_id", "target_table": "goals", "target_column": "id"},
+  {"source_table": "goals", "source_column": "workspace_id", "target_table": "workspaces", "target_column": "id"},
+  {"source_table": "profiles", "source_column": "active_workspace_id", "target_table": "workspaces", "target_column": "id"},
+  {"source_table": "projects", "source_column": "goal_id", "target_table": "goals", "target_column": "id"},
+  {"source_table": "projects", "source_column": "workspace_id", "target_table": "workspaces", "target_column": "id"},
+  {"source_table": "tasks", "source_column": "workspace_id", "target_table": "workspaces", "target_column": "id"},
+  {"source_table": "user_status", "source_column": "workspace_id", "target_table": "workspaces", "target_column": "id"},
+  {"source_table": "workspace_members", "source_column": "workspace_id", "target_table": "workspaces", "target_column": "id"}
+]
