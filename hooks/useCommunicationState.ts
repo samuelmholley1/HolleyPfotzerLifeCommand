@@ -43,7 +43,7 @@ export const useCommunicationState = (): UseCommunicationStateReturn => {
   const [isConnected, setIsConnected] = useState(true);
   const subscriptionRef = useRef<any>(null);
   const isMountedRef = useRef(true);
-  const retryTimeoutRef = useRef<number | null>(null);
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Validate and sanitize data from database
   const validateCommunicationMode = useCallback((mode: CommunicationMode): CommunicationState => {
