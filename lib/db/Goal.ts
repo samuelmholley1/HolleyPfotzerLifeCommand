@@ -6,23 +6,23 @@ import { field, text, date, readonly } from '@nozbe/watermelondb/decorators';
 export class Goal extends Model {
   static table = 'goals';
 
-  @text('title') title: string;
-  @text('description') description: string;
-  @text('status') status: 'draft' | 'active' | 'on_hold' | 'completed' | 'cancelled';
-  @text('priority') priority: 'low' | 'medium' | 'high' | 'critical';
-  @text('category') category: 'health' | 'career' | 'financial' | 'personal' | 'relationships' | 'learning';
-  @field('target_date') targetDate: number | null;
-  @field('start_date') startDate: number | null;
-  @field('completion_percentage') completionPercentage: number;
-  @field('workspace_id') workspaceId: string;
-  @field('parent_goal_id') parentGoalId: string | null;
-  @text('tags') tags: string; // JSON array stored as string
-  @text('metrics') metrics: string; // JSON object for tracking progress
-  @field('completed_at') completedAt: number | null;
-  @field('is_synced') isSynced: boolean;
-  @field('goal_uuid') goalUuid: string;
-  @readonly @date('created_at') createdAt: Date;
-  @readonly @date('updated_at') updatedAt: Date;
+  @text('title') title!: string;
+  @text('description') description!: string;
+  @text('status') status!: 'draft' | 'active' | 'on_hold' | 'completed' | 'cancelled';
+  @text('priority') priority!: 'low' | 'medium' | 'high' | 'critical';
+  @text('category') category!: 'health' | 'career' | 'financial' | 'personal' | 'relationships' | 'learning';
+  @field('target_date') targetDate!: number | null;
+  @field('start_date') startDate!: number | null;
+  @field('completion_percentage') completionPercentage!: number;
+  @field('workspace_id') workspaceId!: string;
+  @field('parent_goal_id') parentGoalId!: string | null;
+  @text('tags') tags!: string; // JSON array stored as string
+  @text('metrics') metrics!: string; // JSON object for tracking progress
+  @field('completed_at') completedAt!: number | null;
+  @field('is_synced') isSynced!: boolean;
+  @field('goal_uuid') goalUuid!: string;
+  @readonly @date('created_at') createdAt!: Date;
+  @readonly @date('updated_at') updatedAt!: Date;
 
   // Helper methods
   get tagsArray(): string[] {

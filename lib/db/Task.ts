@@ -6,25 +6,25 @@ import { field, text, date, readonly } from '@nozbe/watermelondb/decorators';
 export class Task extends Model {
   static table = 'tasks';
 
-  @text('title') title: string;
-  @text('description') description: string;
-  @text('status') status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
-  @text('priority') priority: 'low' | 'medium' | 'high' | 'urgent';
-  @text('category') category: 'work' | 'health' | 'personal' | 'strategy';
-  @field('due_date') dueDate: number | null;
-  @field('estimated_duration') estimatedDuration: number | null; // minutes
-  @field('actual_duration') actualDuration: number | null; // minutes
-  @field('workspace_id') workspaceId: string;
-  @field('parent_task_id') parentTaskId: string | null;
-  @field('project_id') projectId: string | null;
-  @field('goal_id') goalId: string | null;
-  @text('tags') tags: string; // JSON array stored as string
-  @field('completed_at') completedAt: number | null;
-  @field('is_synced') isSynced: boolean;
-  @field('task_uuid') taskUuid: string;
-  @field('slug') slug: string; // Human-friendly identifier for admin/debugging
-  @readonly @date('created_at') createdAt: Date;
-  @readonly @date('updated_at') updatedAt: Date;
+  @text('title') title!: string;
+  @text('description') description!: string;
+  @text('status') status!: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  @text('priority') priority!: 'low' | 'medium' | 'high' | 'urgent';
+  @text('category') category!: 'work' | 'health' | 'personal' | 'strategy';
+  @field('due_date') dueDate!: number | null;
+  @field('estimated_duration') estimatedDuration!: number | null; // minutes
+  @field('actual_duration') actualDuration!: number | null; // minutes
+  @field('workspace_id') workspaceId!: string;
+  @field('parent_task_id') parentTaskId!: string | null;
+  @field('project_id') projectId!: string | null;
+  @field('goal_id') goalId!: string | null;
+  @text('tags') tags!: string; // JSON array stored as string
+  @field('completed_at') completedAt!: number | null;
+  @field('is_synced') isSynced!: boolean;
+  @field('task_uuid') taskUuid!: string;
+  @field('slug') slug!: string; // Human-friendly identifier for admin/debugging
+  @readonly @date('created_at') createdAt!: Date;
+  @readonly @date('updated_at') updatedAt!: Date;
 
   // Helper methods
   get tagsArray(): string[] {

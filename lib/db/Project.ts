@@ -6,26 +6,26 @@ import { field, text, date, readonly } from '@nozbe/watermelondb/decorators';
 export class Project extends Model {
   static table = 'projects';
 
-  @text('title') title: string;
-  @text('description') description: string;
-  @text('status') status: 'planning' | 'active' | 'on_hold' | 'completed' | 'cancelled';
-  @text('priority') priority: 'low' | 'medium' | 'high' | 'urgent';
-  @text('category') category: 'work' | 'personal' | 'health' | 'learning' | 'side_project';
-  @field('start_date') startDate: number | null;
-  @field('target_completion_date') targetCompletionDate: number | null;
-  @field('actual_completion_date') actualCompletionDate: number | null;
-  @field('estimated_duration') estimatedDuration: number | null; // total estimated hours
-  @field('actual_duration') actualDuration: number | null; // total actual hours
-  @field('completion_percentage') completionPercentage: number;
-  @field('workspace_id') workspaceId: string;
-  @field('goal_id') goalId: string | null;
-  @text('tags') tags: string; // JSON array stored as string
-  @text('milestones') milestones: string; // JSON array of milestone objects
-  @text('resources') resources: string; // JSON array of resource links/notes
-  @field('is_synced') isSynced: boolean;
-  @field('project_uuid') projectUuid: string;
-  @readonly @date('created_at') createdAt: Date;
-  @readonly @date('updated_at') updatedAt: Date;
+  @text('title') title!: string;
+  @text('description') description!: string;
+  @text('status') status!: 'planning' | 'active' | 'on_hold' | 'completed' | 'cancelled';
+  @text('priority') priority!: 'low' | 'medium' | 'high' | 'urgent';
+  @text('category') category!: 'work' | 'personal' | 'health' | 'learning' | 'side_project';
+  @field('start_date') startDate!: number | null;
+  @field('target_completion_date') targetCompletionDate!: number | null;
+  @field('actual_completion_date') actualCompletionDate!: number | null;
+  @field('estimated_duration') estimatedDuration!: number | null; // total estimated hours
+  @field('actual_duration') actualDuration!: number | null; // total actual hours
+  @field('completion_percentage') completionPercentage!: number;
+  @field('workspace_id') workspaceId!: string;
+  @field('goal_id') goalId!: string | null;
+  @text('tags') tags!: string; // JSON array stored as string
+  @text('milestones') milestones!: string; // JSON array of milestone objects
+  @text('resources') resources!: string; // JSON array of resource links/notes
+  @field('is_synced') isSynced!: boolean;
+  @field('project_uuid') projectUuid!: string;
+  @readonly @date('created_at') createdAt!: Date;
+  @readonly @date('updated_at') updatedAt!: Date;
 
   // Helper methods
   get tagsArray(): string[] {
