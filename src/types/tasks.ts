@@ -4,3 +4,9 @@ export type CreateTaskInput = {
   description?: string;
   priority: number;
 };
+
+// ----- Added automatically (July 6 2025) ------------------------------
+// Re-export the Task row shape from the canonical Supabase schema
+import { Database } from '../supabase';
+export type Task = Database['public']['Tables']['tasks']['Row'];
+// ----------------------------------------------------------------------
