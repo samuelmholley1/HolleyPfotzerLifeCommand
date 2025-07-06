@@ -11,14 +11,10 @@ export default defineConfig({
     navigationTimeout: 30000,
   },
   webServer: {
-    env: {
-      NEXT_PUBLIC_PW_E2E: '1',
-      NEXT_PUBLIC_USE_MOCK_AUTH: 'true',
-    },
+    command: 'yarn test:e2e:dev',
     cwd: __dirname,
-    command: 'yarn dev',
-    url: baseURL,
+    url: 'http://localhost:3000',
     reuseExistingServer: false,
-    timeout: 120000,
+    timeout: 120_000,
   },
 });

@@ -24,7 +24,7 @@ export const MockAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     process.env.NEXT_PUBLIC_PW_E2E === '1' ||
     process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true'
   ) {
-    // In E2E or mock-auth mode, provide mock user context to children
+    // Provide mock user context *and* render the real app UI
     return (
       <MockAuthContext.Provider
         value={{

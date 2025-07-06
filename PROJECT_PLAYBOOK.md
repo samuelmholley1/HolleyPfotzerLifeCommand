@@ -732,7 +732,7 @@ INSERT INTO tasks (
 2. **React Components (BLOCKING):**
    - `src/components/TaskList.tsx` - **MISSING** (Referenced in Dashboard.tsx line 21)
    - `src/components/TaskForm.tsx` - **MISSING** (Referenced in Dashboard.tsx line 22)
-   - Entire `src/components/` directory structure - **MISSING**
+   - Entire `src/components/` directory - **MISSING**
 
 3. **Next.js Application Structure (BLOCKING):**
    - `pages/` directory OR `app/` directory - **MISSING**
@@ -784,4 +784,4 @@ INSERT INTO tasks (
 - 2025-01-05: Repository publishing and branch management
 - 2025-07-04: Task model updated to include slug field (lib/db/Task.ts).
 - 2025-07-04: TaskCard updated to display slug for admin/debugging (components/tasks/TaskCard.tsx).
-- 2025-07-05: Core data models (Task, Project, Goal) strictly defined in TypeScript with workspaceId for multi-workspace support. All MVP data models now strictly typed and documented in /types/ directory.
+- 2025-07-06: Playwright E2E Test Suite & Ergonomic Scripts setup
