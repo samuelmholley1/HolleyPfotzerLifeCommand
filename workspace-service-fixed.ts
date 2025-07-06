@@ -94,7 +94,7 @@ export class WorkspaceService {
       }
 
       // If user belongs to any workspace, use the first one
-      if (userWorkspaces && userWorkspaces.length > 0) {
+      if (userWorkspaces) {
         const workspace = userWorkspaces.workspace;
         console.log('Found existing workspace membership:', workspace);
         
