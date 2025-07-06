@@ -1,0 +1,51 @@
+-- DATABASE_SNAPSHOT_RELATIONSHIPS_PART1.sql
+-- Foreign key relationships snapshot: shows how tables are linked (source_table.column -> target_table.column)
+-- To regenerate, run this query in Supabase SQL editor:
+--
+-- SELECT
+--     tc.table_name AS source_table,
+--     kcu.column_name AS source_column,
+--     ccu.table_name AS target_table,
+--     ccu.column_name AS target_column
+-- FROM
+--     information_schema.table_constraints AS tc
+--     JOIN information_schema.key_column_usage AS kcu
+--       ON tc.constraint_name = kcu.constraint_name
+--       AND tc.table_schema = kcu.table_schema
+--     JOIN information_schema.constraint_column_usage AS ccu
+--       ON ccu.constraint_name = tc.constraint_name
+--       AND ccu.table_schema = tc.table_schema
+-- WHERE tc.constraint_type = 'FOREIGN KEY'
+--   AND tc.table_schema = 'public'
+-- ORDER BY source_table, source_column;
+--
+-- Copy ALL contents of this file and run as a single query to get the foreign key relationships.
+
+-- =============================
+-- AGENT PROTOCOL (MANDATORY, 2025-07-04):
+--
+-- 1. Before taking any action, review this audit log and the PROJECT_PLAYBOOK.md for current context and unresolved issues.
+-- 2. Always confirm you are working with the correct, up-to-date database instance and schema.
+-- 3. If a critical discrepancy is logged here, do NOT proceed with downstream tasks until the root cause is investigated and documented.
+-- 4. All findings, actions, and decisions must be logged in both this file and PROJECT_PLAYBOOK.md.
+-- 5. If you are a new agent or after a context reset, read the full agent onboarding protocol in schema.ts and PROJECT_PLAYBOOK.md before proceeding.
+--
+-- =============================
+-- AUDIT LOG (2025-07-04):
+-- Supabase blocks cross-schema FKs to auth.users. Proceeding with app-level validation and feature work. See PROJECT_PLAYBOOK.md for details.
+--
+-- ISSUE: Expected foreign key relationships in the public schema, but running the canonical FK query returned NO ROWS.
+--
+-- This is a critical architectural discrepancy. The DDL snapshot and schema documentation both show many foreign key constraints in public (see DATABASE_SNAPSHOT_DDL.sql), but the live database did not return any when queried.
+--
+-- NEXT STEPS:
+-- 1. Begin a strategic, root-cause diagnostic:
+--    - Confirm you are connected to the correct, up-to-date database instance.
+--    - Check for missing or failed migrations, or schema drift between environments.
+--    - Review permissions and visibility for information_schema in your SQL tool.
+--    - Compare the output of `\dt public.*` and `\d+ tablename` for a few key tables.
+--    - If using Supabase, ensure the project is not in a reset or empty state.
+-- 2. Do NOT simply patch superficial errors or symbols—investigate for deep architectural or migration issues.
+-- 3. Log all findings and actions in PROJECT_PLAYBOOK.md and onboarding docs.
+--
+-- Until resolved, treat all downstream snapshot/validation results as potentially unreliable.

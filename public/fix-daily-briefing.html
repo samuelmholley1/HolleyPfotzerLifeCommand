@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Daily Briefing Function</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fix Daily Briefing Function</h1>
+    
+    <div class="container">
+        <h2>Current Status</h2>
+        <div id="status">Loading...</div>
+        
+        <h2>Actions</h2>
+        <button id="testBtn" onclick="testFunction()">1. Test Current Function</button>
+        <button id="fixBtn" onclick="fixFunction()">2. Fix Function</button>
+        <button id="testFixedBtn" onclick="testFixed()">3. Test Fixed Function</button>
+        
+        <h2>Output</h2>
+        <pre id="output"></pre>
+    </div>
+
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://nztnugncfiauygvywyoz.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56dG51Z25jZmlhdXlndnl3eW96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzMDIwNDIsImV4cCI6MjA2Njg3ODA0Mn0.OawaisMtiGffR-QzYZnFPVv4uVtg7rX_gMUjvODu1W8';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        let output = '';
+        
+        function log(message) {
+            output += message + '\\n';
+            document.getElementById('output').textContent = output;
+            console.log(message);
+        }
+        
+        function clearOutput() {
+            output = '';
+            document.getElementById('output').textContent = '';
+        }
+        
+        async function testFunction() {
+            clearOutput();
+            log('Testing current function...');
+            
+            try {
+                const { data, error } = await supabase.rpc('get_daily_briefing_members', { 
+                    p_workspace_id: '00000000-0000-0000-0000-000000000000'
+                });
+                
+                if (error) {
+                    log('❌ Function error: ' + error.message);
+                    if (error.message.includes('ambiguous')) {
+                        log('⚠️ Column ambiguity detected - function needs fixing');
+                        document.getElementById('status').innerHTML = '<div class="error">Function exists but has column ambiguity error</div>';
+                    }
+                } else {
+                    log('✅ Function works! Data: ' + JSON.stringify(data));
+                    document.getElementById('status').innerHTML = '<div class="success">Function works correctly</div>';
+                }
+            } catch (err) {
+                log('❌ Error: ' + err.message);
+                document.getElementById('status').innerHTML = '<div class="error">Error testing function</div>';
+            }
+        }
+        
+        async function fixFunction() {
+            clearOutput();
+            log('Attempting to fix function...');
+            
+            // Since we can\\'t execute SQL directly, provide instructions
+            log('⚠️ Cannot execute SQL directly from browser for security reasons.');
+            log('');
+            log('Please go to your Supabase dashboard and run this SQL:');
+            log('');
+            log('CREATE OR REPLACE FUNCTION public.get_daily_briefing_members(p_workspace_id UUID)');
+            log('RETURNS TABLE (');
+            log('    user_id UUID,');
+            log('    name TEXT,');
+            log('    email TEXT,');
+            log('    avatar_url TEXT,');
+            log('    last_active TIMESTAMPTZ,');
+            log('    status TEXT,');
+            log('    custom_status TEXT');
+            log(')');
+            log('LANGUAGE plpgsql');
+            log('SECURITY DEFINER');
+            log('SET search_path = public');
+            log('AS $$');
+            log('BEGIN');
+            log('    RETURN QUERY');
+            log('    SELECT ');
+            log('        profiles.id AS user_id,');
+            log('        profiles.name,');
+            log('        profiles.email,');
+            log('        profiles.avatar_url,');
+            log('        profiles.updated_at AS last_active,');
+            log('        \\'active\\'::TEXT AS status,');
+            log('        NULL::TEXT AS custom_status');
+            log('    FROM ');
+            log('        profiles');
+            log('    INNER JOIN ');
+            log('        workspace_members ON profiles.id = workspace_members.profile_id');
+            log('    WHERE ');
+            log('        workspace_members.workspace_id = p_workspace_id');
+            log('    ORDER BY ');
+            log('        profiles.updated_at DESC;');
+            log('END;');
+            log('$$;');
+            log('');
+            log('GRANT EXECUTE ON FUNCTION public.get_daily_briefing_members(UUID) TO authenticated;');
+            
+            document.getElementById('status').innerHTML = '<div class="info">Please run the SQL above in Supabase dashboard</div>';
+        }
+        
+        async function testFixed() {
+            clearOutput();
+            log('Testing fixed function...');
+            
+            try {
+                const { data, error } = await supabase.rpc('get_daily_briefing_members', { 
+                    p_workspace_id: '00000000-0000-0000-0000-000000000000'
+                });
+                
+                if (error) {
+                    log('❌ Function still has error: ' + error.message);
+                    document.getElementById('status').innerHTML = '<div class="error">Function still needs fixing</div>';
+                } else {
+                    log('✅ Function fixed successfully! Data: ' + JSON.stringify(data));
+                    document.getElementById('status').innerHTML = '<div class="success">Function working correctly!</div>';
+                }
+            } catch (err) {
+                log('❌ Error: ' + err.message);
+                document.getElementById('status').innerHTML = '<div class="error">Error testing function</div>';
+            }
+        }
+        
+        // Auto-test on page load
+        window.onload = function() {
+            testFunction();
+        };
+    </script>
+</body>
+</html>

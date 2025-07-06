@@ -1,53 +1,3 @@
-<<<<<<< HEAD
-# Dependencies
-node_modules/
-/.pnp
-.pnp.js
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
-
-# Testing
-/coverage
-/.nyc_output
-
-# Next.js
-/.next/
-/out/
-
-# Production
-/build
-
-# Misc
-.DS_Store
-*.pem
-
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Local env files
-.env*.local
-.env
-
-# Vercel
-.vercel
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
-# Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-
-# Package lock files (using Yarn)
-package-lock.json
-=======
 # OSX
 #
 .DS_Store
@@ -88,8 +38,13 @@ local.properties
 # node.js
 #
 node_modules/
-npm-debug.log
-yarn-error.log
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # fastlane
 #
@@ -123,13 +78,7 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-.pnp.*
 
-# Build artifacts
-.next/
+# Web build
 dist/
-out/
-
-# Build info
-tsconfig.tsbuildinfo
->>>>>>> daf697366a51adb59803f0c238783883a47ac460
+*.tsbuildinfo

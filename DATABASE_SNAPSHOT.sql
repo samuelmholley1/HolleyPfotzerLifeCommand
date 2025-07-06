@@ -1,0 +1,21 @@
+-- DATABASE_SNAPSHOT.sql
+-- Canonical snapshot of the current live database schema for onboarding, debugging, and agent reference.
+-- Generated on: 2025-07-04
+--
+-- To regenerate: Use one of the following commands (PostgreSQL examples):
+--   1. For full schema (DDL):
+--      pg_dump --schema-only --no-owner --no-privileges $DATABASE_URL > DATABASE_SNAPSHOT.sql
+--   2. For a human-readable table/column summary (recommended for onboarding):
+--      \copy (SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema = 'public' ORDER BY table_name, ordinal_position) TO 'DATABASE_SNAPSHOT_COLUMNS.csv' WITH CSV HEADER
+--   3. For a quick SQL query (copy-paste into Supabase SQL editor):
+--      SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema = 'public' ORDER BY table_name, ordinal_position;
+--
+-- Use the DDL (pg_dump) for migrations and full schema diffs.
+-- Use the column summary for onboarding, quick reference, and agent context.
+--
+-- If you need both, generate both files and store them as DATABASE_SNAPSHOT.sql (DDL) and DATABASE_SNAPSHOT_COLUMNS.csv (column summary).
+--
+-- ACTION LOG: Docker Compose and Dockerfile Relocation (2025-07-04)
+-- 2025-07-04: Moved `docker-compose.yml` and `Dockerfile` into `HolleyPfotzerLifeCommand/` to standardize build/test automation. Confirmed `package-lock.json` is present for dependency locking. All agents/scripts must use these files from this directory.
+--
+-- End of snapshot.

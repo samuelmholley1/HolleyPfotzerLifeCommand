@@ -1,0 +1,428 @@
+// components/Dashboard.tsx
+
+import React, { useState, useEffect } from 'react';
+import { 
+  View, 
+  Text, 
+  TouchableOpacity, 
+  StyleSheet, 
+  ScrollView,
+  Alert,
+  useColorScheme,
+  ActivityIndicator,
+  TextInput 
+} from 'react-native';
+import { v4 as uuidv4 } from 'uuid';
+import { database, Event, EventDataType } from '../lib/db/index';
+import { generateUserIdentity, encryptEvent, decryptEvent } from '../lib/crypto.simple';
+import { syncEvents } from '../lib/sync';
+import { withObservables } from '@nozbe/watermelondb/react';
+import { EventCard } from './EventCard';
+import { TaskList } from '../src/components/TaskList';
+import { TaskForm } from '../src/components/TaskForm';
+import { TaskService } from '../services/taskService';
+
+interface DashboardProps {
+  events: Event[];
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ events }) => {
+    const [textInput, setTextInput] = useState('');
+    const [cryptoReady, setCryptoReady] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [syncing, setSyncing] = useState(false);
+    const [tasks, setTasks] = useState<any[]>([]);
+    const [creating, setCreating] = useState(false);
+    const isDarkMode = useColorScheme() === 'dark';
+
+    // Initialize cryptography on component mount
+    useEffect(() => {
+        const setupCrypto = async () => {
+            try {
+                await generateUserIdentity();
+                setCryptoReady(true);
+                console.log('Dashboard: Cryptography ready');
+            } catch (error) {
+                console.error('Dashboard: Failed to initialize crypto:', error);
+                Alert.alert('Security Error', 'Failed to initialize encryption. Please restart the app.');
+            }
+        };
+        
+        setupCrypto();
+    }, []);
+
+    useEffect(() => {
+      fetchTasks();
+    }, []);
+
+    const fetchTasks = async () => {
+      setLoading(true);
+      try {
+        const data = await TaskService.getTasksSimple();
+        setTasks(data);
+      } catch (e) {
+        // handle error (could show alert)
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const logNewEvent = async (content: string) => {
+        if (!cryptoReady) {
+            Alert.alert('Not Ready', 'Encryption is still initializing. Please wait.');
+            return;
+        }
+
+        if (!content.trim()) {
+            Alert.alert('Error', 'Please enter some content for the event.');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            // Create event data
+            const eventData: EventDataType = {
+                name: content.trim(),
+                notes: 'Manually entered event'
+            };
+
+            // Encrypt the event data
+            const encryptedPayload = await encryptEvent(eventData);
+            if (!encryptedPayload) {
+                throw new Error('Failed to encrypt event data');
+            }
+
+            // Generate our proper UUID
+            const newEventId = uuidv4();
+
+            // Create event in WatermelonDB
+            await database.write(async () => {
+                const eventsCollection = database.collections.get<Event>('events');
+                await eventsCollection.create((event) => {
+                    event.eventUUID = newEventId;
+                    event.eventType = 'manual_log';
+                    event.timestamp = Date.now();
+                    event.encryptedPayload = encryptedPayload;
+                    event.isSynced = false;
+                    event.createdAt = new Date();
+                    event.updatedAt = new Date();
+                });
+            });
+
+            console.log(`Event logged successfully with UUID: ${newEventId}`);
+            setTextInput(''); // Clear input after successful logging
+            Alert.alert('Success', `Logged: "${content}"`);
+            
+            // Auto-sync after logging
+            handleSync();
+        } catch (error) {
+            console.error('Error logging event:', error);
+            Alert.alert('Error', 'Failed to log event. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSync = async () => {
+        setSyncing(true);
+        try {
+            await syncEvents();
+            console.log('Sync completed successfully');
+        } catch (error) {
+            console.error('Sync failed:', error);
+            Alert.alert('Sync Error', 'Failed to sync events. Please check your internet connection.');
+        } finally {
+            setSyncing(false);
+        }
+    };
+
+    const handleCreateTask = async (title: string) => {
+      setCreating(true);
+      try {
+        await TaskService.createTaskSimple({ title });
+        await fetchTasks();
+      } catch (e) {
+        // handle error (could show alert)
+      } finally {
+        setCreating(false);
+      }
+    };
+
+    const themeStyles = {
+        backgroundColor: isDarkMode ? '#000' : '#fff',
+        textColor: isDarkMode ? '#fff' : '#000',
+        subtitleColor: isDarkMode ? '#ccc' : '#666',
+        cardBackground: isDarkMode ? '#333' : '#f5f5f5',
+        buttonColor: '#4285F4',
+        inputBackground: isDarkMode ? '#222' : '#f9f9f9',
+        inputBorder: isDarkMode ? '#555' : '#ddd',
+    };
+
+    return (
+        <View style={[styles.container, { backgroundColor: themeStyles.backgroundColor }]}>
+            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+                <Text style={[styles.title, { color: themeStyles.textColor }]}>
+                    Life Command Center
+                </Text>
+                
+                <Text style={[styles.subtitle, { color: themeStyles.subtitleColor }]}>
+                    Secure Health Event Tracking
+                </Text>
+
+                {/* Manual Input Section */}
+                <View style={styles.inputSection}>
+                    <Text style={[styles.sectionTitle, { color: themeStyles.textColor }]}>
+                        Log New Event
+                    </Text>
+                    
+                    <TextInput
+                        style={[
+                            styles.textInput,
+                            {
+                                backgroundColor: themeStyles.inputBackground,
+                                borderColor: themeStyles.inputBorder,
+                                color: themeStyles.textColor,
+                            }
+                        ]}
+                        placeholder="Enter event details (e.g., 'headache severity 7')"
+                        placeholderTextColor={themeStyles.subtitleColor}
+                        value={textInput}
+                        onChangeText={setTextInput}
+                        multiline
+                        numberOfLines={3}
+                    />
+                    
+                    <TouchableOpacity 
+                        style={[
+                            styles.logButton, 
+                            { backgroundColor: themeStyles.buttonColor },
+                            (!cryptoReady || loading) && styles.disabledButton
+                        ]}
+                        onPress={() => logNewEvent(textInput)}
+                        disabled={!cryptoReady || loading}
+                    >
+                        {loading ? (
+                            <ActivityIndicator color="#fff" size="small" />
+                        ) : (
+                            <Text style={styles.logButtonText}>Log Event</Text>
+                        )}
+                    </TouchableOpacity>
+                </View>
+
+                {/* Sync Section */}
+                <View style={styles.syncSection}>
+                    <TouchableOpacity 
+                        style={[
+                            styles.syncButton, 
+                            { backgroundColor: syncing ? '#999' : '#4CAF50' }
+                        ]}
+                        onPress={handleSync}
+                        disabled={syncing}
+                    >
+                        {syncing ? (
+                            <ActivityIndicator color="#fff" size="small" />
+                        ) : (
+                            <Text style={styles.syncButtonText}>Sync Events</Text>
+                        )}
+                    </TouchableOpacity>
+                </View>
+
+                {/* Events List */}
+                <View style={styles.eventsSection}>
+                    <Text style={[styles.sectionTitle, { color: themeStyles.textColor }]}>
+                        Recent Events ({events.length})
+                    </Text>
+                    
+                    {events.length === 0 ? (
+                        <View style={[styles.emptyState, { backgroundColor: themeStyles.cardBackground }]}>
+                            <Text style={[styles.emptyStateText, { color: themeStyles.subtitleColor }]}>
+                                No events logged yet. Start by logging your first event above!
+                            </Text>
+                        </View>
+                    ) : (
+                        events.map((event, index) => (
+                            <EventCard 
+                                key={index}
+                                event={event} 
+                                index={index} 
+                                isDarkMode={isDarkMode} 
+                                styles={styles} 
+                            />
+                        ))
+                    )}
+                </View>
+
+                {/* Task Management Section */}
+                <View style={styles.taskSection}>
+                    <Text style={[styles.sectionTitle, { color: themeStyles.textColor }]}>
+                        Task Management
+                    </Text>
+                    
+                    <TaskForm onCreate={handleCreateTask} />
+
+                    <TaskList tasks={tasks} loading={loading || creating} />
+                </View>
+
+                {/* Crypto Status */}
+                <View style={styles.statusSection}>
+                    <Text style={[styles.statusText, { 
+                        color: cryptoReady ? '#4CAF50' : '#FF9800' 
+                    }]}>
+                        🔐 Encryption: {cryptoReady ? 'Ready' : 'Initializing...'}
+                    </Text>
+                </View>
+            </ScrollView>
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    scrollView: {
+        flex: 1,
+    },
+    scrollContent: {
+        padding: 20,
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 8,
+    },
+    subtitle: {
+        fontSize: 16,
+        textAlign: 'center',
+        marginBottom: 30,
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: '600',
+        marginBottom: 15,
+    },
+    inputSection: {
+        marginBottom: 30,
+    },
+    textInput: {
+        borderWidth: 1,
+        borderRadius: 8,
+        padding: 15,
+        fontSize: 16,
+        marginBottom: 15,
+        textAlignVertical: 'top',
+    },
+    logButton: {
+        padding: 15,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 50,
+    },
+    logButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    disabledButton: {
+        backgroundColor: '#999',
+    },
+    syncSection: {
+        marginBottom: 30,
+    },
+    syncButton: {
+        padding: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 45,
+    },
+    syncButtonText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: '600',
+    },
+    eventsSection: {
+        marginBottom: 30,
+    },
+    eventCard: {
+        padding: 15,
+        borderRadius: 8,
+        marginBottom: 10,
+    },
+    eventHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    eventType: {
+        fontSize: 14,
+        fontWeight: '600',
+        textTransform: 'capitalize',
+    },
+    eventTime: {
+        fontSize: 12,
+    },
+    eventContent: {
+        marginBottom: 10,
+    },
+    eventName: {
+        fontSize: 16,
+        fontWeight: '500',
+        marginBottom: 5,
+    },
+    eventNotes: {
+        fontSize: 14,
+        marginBottom: 5,
+    },
+    eventSeverity: {
+        fontSize: 14,
+        fontWeight: '500',
+    },
+    eventMood: {
+        fontSize: 14,
+        fontWeight: '500',
+    },
+    eventFooter: {
+        alignItems: 'flex-end',
+    },
+    syncStatus: {
+        fontSize: 12,
+        fontWeight: '500',
+    },
+    eventDecrypting: {
+        fontSize: 14,
+        textAlign: 'center',
+        marginTop: 5,
+    },
+    emptyState: {
+        padding: 20,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    emptyStateText: {
+        fontSize: 16,
+        textAlign: 'center',
+    },
+    statusSection: {
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    statusText: {
+        fontSize: 14,
+        fontWeight: '500',
+    },
+    taskSection: {
+        marginBottom: 30,
+    },
+});
+
+// Enhanced observable function to connect with WatermelonDB
+const enhance = withObservables([], () => ({
+  events: database.get<Event>('events').query().observeWithColumns(['updated_at']),
+}));
+
+export const EnhancedDashboard = enhance(Dashboard);
+export default Dashboard;
