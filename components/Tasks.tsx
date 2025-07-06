@@ -243,7 +243,7 @@ const Tasks: React.FC = () => {
                 <View style={styles.taskRight}>
                   <View style={[
                     styles.priorityBadge,
-                    { backgroundColor: getPriorityColor(task.priority ?? 'default') }
+                    { backgroundColor: getPriorityColor(String(task.priority ?? 'default')) }
                   ]}>
                     <Text style={styles.priorityText}>{task.priority}</Text>
                   </View>
