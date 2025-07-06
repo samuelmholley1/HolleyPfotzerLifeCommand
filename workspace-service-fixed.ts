@@ -86,7 +86,8 @@ export class WorkspaceService {
           workspace:workspaces(*)
         `)
         .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
-        .limit(1);
+        .limit(1)
+        .single();
 
       if (workspacesError) {
         console.error('Error fetching user workspaces:', workspacesError);
@@ -94,7 +95,7 @@ export class WorkspaceService {
 
       // If user belongs to any workspace, use the first one
       if (userWorkspaces && userWorkspaces.length > 0) {
-        const workspace = userWorkspaces[0].workspace;
+        const workspace = userWorkspaces.workspace;
         console.log('Found existing workspace membership:', workspace);
         
         // Update their profile to set this as active workspace
