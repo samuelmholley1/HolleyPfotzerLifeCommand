@@ -1,97 +1,168 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Holley-Pfotzer Life Command App
 
-# Getting Started
+A Next.js/React Native Web hybrid application for collaborative life management, designed with ADHD/trauma-informed principles.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Current Status (Updated: 2025-07-05)
 
-## Step 1: Start Metro
+**✅ BUILD STATUS**: Production builds working, all TypeScript errors resolved  
+**✅ PLATFORM SPLIT**: Native and web code properly separated  
+**✅ SECURITY**: Signal Protocol end-to-end encryption implemented  
+**✅ TYPE SYSTEM**: Comprehensive TypeScript types in place  
+**✅ DATA MODELS**: Task, Project, and Goal interfaces strictly defined with workspaceId for multi-workspace support  
+**✅ REPOSITORY**: Published to GitHub, main branch synchronized  
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Tech Stack
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- **Next.js 14.2.3** - Primary web framework
+- **React Native Web 0.20.0** - Cross-platform UI
+- **WatermelonDB 0.28.0** - Local database
+- **Supabase 2.50.2** - Backend/sync
+- **Signal Protocol 0.76.3** - End-to-end encryption
+- **TypeScript 5.8.3** - Type safety
+- **Playwright** - Testing framework
 
-```sh
-# Using npm
-npm start
+## Getting Started
 
-# OR using Yarn
-yarn start
+### Prerequisites
+- Node.js 18+ and Yarn
+- Git
+
+### Installation & Setup
+
+1. **Clone and install dependencies**:
+   ```bash
+   git clone https://github.com/samuelmholley1/HolleyPfotzerLifeCommand.git
+   cd HolleyPfotzerLifeCommand
+   yarn install
+   ```
+
+2. **Environment Setup**:
+   - Copy `.env.example` to `.env.local`
+   - Configure Supabase credentials
+   - Set up Google OAuth credentials
+
+3. **Run the development server**:
+   ```bash
+   yarn dev
+   ```
+   Opens at [http://localhost:3000](http://localhost:3000)
+
+### Available Scripts
+
+- `yarn dev` - Start development server
+- `yarn build` - Build for production
+- `yarn start` - Start production server
+- `yarn lint` - Run ESLint
+- `yarn test:e2e` - Run Playwright end-to-end tests
+- `yarn test:ct` - Run component tests
+- `yarn tsc --noEmit` - Type checking only
+
+## Architecture
+
+### Key Architectural Decisions
+
+1. **Platform Splitting**: 
+   - `.native.ts` files for React Native
+   - `.web.ts` files for browser-specific code
+   - Shared interfaces for platform-agnostic code
+   - `tsconfig.json` excludes `*.native.ts` from web builds
+
+2. **Type Safety**:
+   - Centralized types in `/types/` directory
+   - **Core models (`Task`, `Project`, `Goal`) strictly typed and include `workspaceId` for multi-workspace support**
+   - Global type declarations for browser APIs
+   - Definite assignment for WatermelonDB decorated properties
+
+3. **Security**:
+   - Signal Protocol for end-to-end encryption
+   - Guard clauses for browser-only APIs
+   - Service layer handles all crypto operations
+
+4. **Data Layer**:
+   - WatermelonDB for local storage
+   - Supabase for remote sync and authentication
+   - Row-level security (RLS) for data isolation
+
+### Directory Structure
+
+```
+├── components/          # UI components (web/native compatible)
+├── contexts/           # React context providers
+├── hooks/              # Custom React hooks
+├── lib/                # Core utilities and database
+│   ├── db/             # WatermelonDB models and schema
+│   ├── signal/         # Signal Protocol encryption
+│   └── supabase.ts     # Supabase client
+├── services/           # Business logic services
+├── types/              # TypeScript type definitions
+├── pages/              # Next.js pages
+└── public/             # Static assets
 ```
 
-## Step 2: Build and run your app
+## Development Guidelines
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+### For New Agents/Developers
 
-### Android
+**MANDATORY READING ORDER**:
+1. `lib/db/schema.ts` - System architecture and onboarding
+2. `PROJECT_PLAYBOOK.md` - Development philosophy and protocols
+3. Latest database snapshot files
 
-```sh
-# Using npm
-npm run android
+### Key Patterns
 
-# OR using Yarn
-yarn android
-```
+1. **Platform-Specific Code**:
+   ```typescript
+   // services/feature.ts (shared interface)
+   // services/feature.native.ts (React Native)
+   // services/feature.web.ts (Web browser)
+   ```
 
-### iOS
+2. **Type Definitions**:
+   ```typescript
+   // types/feature.ts - Domain types
+   // types/global.d.ts - Browser globals
+   // types/tasks.ts - Task model (strict, includes workspaceId)
+   // types/projects.ts - Project model (strict, includes workspaceId)
+   // types/goals.ts - Goal model (strict, includes workspaceId)
+   ```
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+3. **Service Layer**:
+   ```typescript
+   // All business logic in /services/
+   // Components only handle UI logic
+   ```
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+## Security
 
-```sh
-bundle install
-```
+- **End-to-End Encryption**: Signal Protocol implementation
+- **Authentication**: Google OAuth via Supabase
+- **Data Protection**: Row-level security with Supabase
+- **Browser Safety**: Guard clauses for window/document access
 
-Then, and every time you update your native dependencies, run:
+## ADHD/Trauma-Informed Design
 
-```sh
-bundle exec pod install
-```
+This project is specifically designed to support users with ADHD, trauma, and cognitive load challenges:
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+- **Clear Documentation**: Step-by-step onboarding and protocols
+- **Minimal Cognitive Load**: Automated validation and clear error messages
+- **Explicit Mapping**: File organization and patterns are documented
+- **Agent Autonomy**: Pre-defined protocols minimize need for repeated clarification
 
-```sh
-# Using npm
-npm run ios
+## Contributing
 
-# OR using Yarn
-yarn ios
-```
+1. Follow the mandatory reading order (see schema.ts)
+2. Update logs in PROJECT_PLAYBOOK.md for all changes
+3. Test both web and native compatibility
+4. Maintain type safety and security patterns
+5. Document architectural decisions
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## Support
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+For technical questions, see:
+- `lib/db/schema.ts` - Architecture overview
+- `PROJECT_PLAYBOOK.md` - Development protocols
+- GitHub issues for bug reports
 
-## Step 3: Modify your app
+---
 
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+**Note**: This is a personal productivity application designed for collaborative life management. The architecture prioritizes user privacy, security, and accessibility for neurodiverse users.
