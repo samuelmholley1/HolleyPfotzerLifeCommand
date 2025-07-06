@@ -1,12 +1,10 @@
-import { Platform } from 'react-native';
-
 // Web-specific Google auth implementation
 let webGoogleAuth: any = null;
 
-if (Platform.OS === 'web') {
+if (typeof window !== 'undefined') {
   const loadGoogleScript = () => {
     return new Promise((resolve, reject) => {
-      if (typeof window !== 'undefined' && (window as any).google) {
+      if ((window as any).google) {
         resolve((window as any).google);
         return;
       }
