@@ -74,3 +74,11 @@ yarn-error.log
 !.yarn/sdks
 !.yarn/versions
 .pnp.*
+
+# Build artifacts
+.next/
+dist/
+out/
+
+# Build info
+tsconfig.tsbuildinfo
