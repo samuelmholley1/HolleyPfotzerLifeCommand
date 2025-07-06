@@ -1,27 +1,21 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000';
 
 export default defineConfig({
-  testDir: './tests',
-  timeout: 30 * 1000,
-  expect: {
-    timeout: 5000,
-    toHaveScreenshot: {
-      maxDiffPixelRatio: 0.02,
-    },
-  },
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  testDir: './e2e',
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:3000',
-    trace: 'on-first-retry',
-    screenshot: 'on',
-    video: 'retain-on-failure',
-    storageState: './tests/auth-storage.json', // Use pre-authenticated state for E2E auth tests
+    baseURL,
+    storageState: './e2e/auth-storage.json',
+    actionTimeout: 10000,
+    navigationTimeout: 30000,
   },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-  ],
+  webServer: {
+    env: { NEXT_PUBLIC_PW_E2E: '1' },
+    cwd: __dirname,
+    command: 'yarn dev',
+    url: baseURL,
+    reuseExistingServer: true,
+    timeout: 120000,
+  },
 });
