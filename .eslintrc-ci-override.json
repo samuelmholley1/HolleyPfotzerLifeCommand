@@ -1,0 +1,8 @@
+{
+  "overrides": [
+    {
+      "files": ["e2e/**/*"],
+      "rules": { "jest/expect-expect": "off", "jest/no-done-callback": "off" }
+    }
+  ]
+}

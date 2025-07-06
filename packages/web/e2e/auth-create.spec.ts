@@ -5,9 +5,9 @@ test('create a task when pre-authenticated', async ({ page }) => {
   await page.goto('/');
 
   // 2. Fill in the task and submit
-  await page.getByPlaceholder('Task title').fill('Buy groceries');
+  await page.getByTestId('task-input').fill('Buy groceries');
   // Click the real button label you see in the UI:
-  await page.getByRole('button', { name: /create task/i }).click();
+  await page.getByTestId('task-create-button').click();
 
   // ↓ pause here so you can see the live DOM
   await page.pause();
