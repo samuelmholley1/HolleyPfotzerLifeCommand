@@ -82,3 +82,5 @@ out/
 
 # Build info
 tsconfig.tsbuildinfo
+
+package-lock.json

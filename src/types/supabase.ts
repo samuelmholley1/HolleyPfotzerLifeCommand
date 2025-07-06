@@ -1,3 +1,40 @@
+// Project Documentation Index
+//
+// Welcome to the Life Command project documentation. This is your starting point for all onboarding, architecture, schema, and process protocols. Every new agent (AI or human) must begin here and follow the links below in order.
+//
+// Mandatory Reading for All New Agents:
+// - PROJECT_PLAYBOOK.md — High-level vision, agent protocols, and links to all other docs
+// - ONBOARDING_GUIDE.md — Step-by-step onboarding and handoff
+// - ARCHITECTURE_OVERVIEW.md — System map, file mapping, and module relationships
+// - MIGRATION_PROTOCOLS.md — WatermelonDB, Supabase, and general migration steps
+// - SECURITY_GUIDE.md — Security, RLS, and environment file handling
+// - OPEN_TASKS.md — Current priorities and next steps
+// - COMPLETED_STEPS_LOG.md — Audit log of all actions and decisions
+// - WATERMELONDB_MIGRATION_MANUAL_VS_AUTOMATIC.md — Manual vs. automatic migration
+//
+// Schema & Types:
+// - WatermelonDB schema: lib/db/schema.ts
+// - Supabase types: src/types/supabase.ts
+// - Database snapshots: DATABASE_SNAPSHOT_*.sql
+//
+// All process docs are linked above. Read in order for full context. For any protocol or process, see the dedicated doc. This index is included at the top of every major process file for agent onboarding and navigation.
+
+/**
+ * ---
+ * MOCK AUTH E2E TESTING & CI SPLIT LANE (2025-07-05)
+ *
+ * - E2E test user and workspace seeded via scripts/seed-test-user.ts (idempotent, upserts mock user/workspace)
+ * - E2E-only RLS policies in supabase/migrations/20250705_mock_user_rls.sql
+ * - MockAuthProvider in src/contexts/MockAuthContext.tsx, toggled by NEXT_PUBLIC_USE_MOCK_AUTH
+ * - Jest config: jest.config.js (ts-jest, jsdom, setupFilesAfterEnv)
+ * - All devDependencies pinned in package.json, including jest@29.7.0
+ * - CI: .github/workflows/mockauth-split.yml runs two jobs (mock auth on/off), both use Yarn and cache
+ * - All test/build/CI issues resolved as of this commit
+ *
+ * For new tables, fields, or RLS, update this file and the corresponding migration in supabase/migrations.
+ * For new auth providers or test protocols, document the toggle and seeding logic here.
+ */
+
 export type Json =
   | string
   | number
@@ -738,7 +775,7 @@ export type Tables<
   }
     ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
   ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {

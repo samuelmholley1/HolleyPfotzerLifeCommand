@@ -27,7 +27,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ onCreate }) => {
         type="text"
         value={title}
         onChange={e => setTitle(e.target.value)}
-        placeholder="Task title"
+        placeholder="Add a task"
         disabled={isSubmitting}
         style={{ padding: '8px', marginRight: '8px' }}
       />

@@ -3,7 +3,7 @@ module.exports = {
   testEnvironment: 'jsdom',
   transform: { '^.+\\.(ts|tsx)$': 'ts-jest' },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
-  testMatch: ['**/?(*.)+(test).[tj]sx?'],          // only unit tests
-  testPathIgnorePatterns: ['<rootDir>/tests/'],    // ignore Playwright
+  testMatch: ['<rootDir>/tests/unit/**/*.test.[tj]s?(x)'],
+  testPathIgnorePatterns: ['<rootDir>/e2e/'],
   passWithNoTests: true
 };

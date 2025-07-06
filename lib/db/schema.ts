@@ -1,4 +1,27 @@
 /**
+ * Project Documentation Index
+ *
+ * Welcome to the Life Command project documentation. This is your starting point for all onboarding, architecture, schema, and process protocols. Every new agent (AI or human) must begin here and follow the links below in order.
+ *
+ * Mandatory Reading for All New Agents:
+ * - PROJECT_PLAYBOOK.md — High-level vision, agent protocols, and links to all other docs
+ * - ONBOARDING_GUIDE.md — Step-by-step onboarding and handoff
+ * - ARCHITECTURE_OVERVIEW.md — System map, file mapping, and module relationships
+ * - MIGRATION_PROTOCOLS.md — WatermelonDB, Supabase, and general migration steps
+ * - SECURITY_GUIDE.md — Security, RLS, and environment file handling
+ * - OPEN_TASKS.md — Current priorities and next steps
+ * - COMPLETED_STEPS_LOG.md — Audit log of all actions and decisions
+ * - WATERMELONDB_MIGRATION_MANUAL_VS_AUTOMATIC.md — Manual vs. automatic migration
+ *
+ * Schema & Types:
+ * - WatermelonDB schema: lib/db/schema.ts
+ * - Supabase types: src/types/supabase.ts
+ * - Database snapshots: DATABASE_SNAPSHOT_*.sql
+ *
+ * All process docs are linked above. Read in order for full context. For any protocol or process, see the dedicated doc. This index is included at the top of every major process file for agent onboarding and navigation.
+ */
+
+/**
  * FOR HUMANS: WHAT THIS FILE IS FOR
  *
  * This file defines the database and system structure. If you are not technical, you do not need to edit this file. For help, see the playbook or ask for a plain-language summary.
@@ -474,4 +497,425 @@ export const schema = appSchema({
  *     - Split CI jobs (mock auth on/off), Yarn-only install, and dependency pinning
  * - All new test protocols, CI changes, or auth providers must be documented in both this file and the playbook.
  * - If onboarding or CI/test instructions change, update this header and the playbook immediately.
+ */
+
+/*
+ * =====================
+ * WATERMELONDB MIGRATION PROTOCOL (2025-07-06)
+ * =====================
+ *
+ * - WatermelonDB migrations are handled automatically at app startup.
+ * - To apply a migration:
+ *     1. Bump the schema version in this file (lib/db/schema.ts).
+ *     2. Add a migration file in lib/db/migrations/ using schemaMigrations from @nozbe/watermelondb.
+ *     3. Launch the app (web or native). WatermelonDB will detect the version bump and run the migration automatically.
+ *     4. Migration errors (if any) will appear in the app logs/console at startup.
+ * - There is NO CLI or yarn script for running WatermelonDB migrations (e.g., `yarn watermelon migrate` does not exist).
+ * - If you are unsure, see this section or check PROJECT_PLAYBOOK.md for protocol updates.
+ * - Never ask the user how to run a migration—refer to this protocol and foundational docs.
+ */
+
+/*
+ * NOTE: As of July 2025, this project is a Yarn Berry monorepo.
+ * All web code is in packages/web/, all native code in packages/native/.
+ * Update all references to code, types, and schema accordingly.
+ */
+
+/**
+ * PROJECT FOUNDATION SCHEMA: Life Command
+ *
+ * This schema defines the core data model for the Life Command system, designed for personal and collaborative productivity,
+ * goal management, project execution, and healthy communication. It is architected for extensibility, analytics, and secure
+ * crossweaving of all user data (tasks, goals, projects, events, clarifications, and communication).
+ *
+ * TABLE OVERVIEW:
+ *
+ * - events:         Immutable event log for all user/system actions (for analytics, audit, and cross-linking).
+ * - tasks:          Actionable items, can be recurring, cross-linked, and organized by project/goal/category.
+ * - goals:          High-level objectives, can be nested, tracked, and linked to projects/tasks.
+ * - projects:       Collections of tasks and milestones, linked to goals, with progress tracking.
+ * - workspaces:     Collaboration spaces (e.g., couples, teams, solo), each with its own data context.
+ * - workspace_members: Membership table for users in workspaces (for permissions, sharing, etc).
+ * - clarifications: Structured assumptions and agreements to reduce miscommunication and track decisions.
+ * - clarification_responses: Individual responses to clarifications (for consensus, audit, and learning).
+ * - communication_modes: Tracks the current communication state (e.g., normal, emergency break) for safety and UX.
+ *
+ * KEY ARCHITECTURAL PRINCIPLES:
+ * - All tables are workspace-scoped for privacy and multi-tenancy.
+ * - All major entities (tasks, goals, projects, events) support cross-linking for analytics and future features (e.g., symptom tracking).
+ * - Designed for secure, encrypted payloads and future zero-knowledge extensions.
+ * - Extensible for future modules: symptom tracking, journaling, advanced analytics, etc.
+ * - All timestamps are Unix epoch (ms) for consistency.
+ * - All tables support sync status for offline/online operation.
+ *
+ * This schema is the "house foundation"—all future features ("furnishings") build on this structure.
+ *
+ * For a visual map, see: events (timeline) <-> tasks <-> goals <-> projects <-> workspaces
+ * Communication and clarifications are first-class, not afterthoughts.
+ */
+
+import { appSchema, tableSchema } from '@nozbe/watermelondb';
+
+export const schema = appSchema({
+  version: 12, // Updated to Schema v12 - aligned with Supabase migration 20250705, see supabase.ts.
+  tables: [
+    tableSchema({
+      name: 'events',
+      columns: [
+        { name: 'event_type', type: 'string' },
+        { name: 'timestamp', type: 'number' }, // Unix timestamp for performance
+        { name: 'is_synced', type: 'boolean' },
+        { name: 'encrypted_payload', type: 'string' },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
+        { name: 'event_uuid', type: 'string', isOptional: true },
+        { name: 'workspace_id', type: 'string', isIndexed: true },
+        { name: 'project_id', type: 'string', isOptional: true, isIndexed: true },
+      ]
+    }),
+    tableSchema({
+      name: 'tasks',
+      columns: [
+        { name: 'title', type: 'string' },
+        { name: 'description', type: 'string', isOptional: true },
+        { name: 'status', type: 'string' }, // matches Supabase: string enum
+        { name: 'priority', type: 'number' }, // matches Supabase: number enum
+        { name: 'category', type: 'string' },
+        { name: 'due_date', type: 'number', isOptional: true }, // matches Supabase: number (timestamp)
+        { name: 'estimated_duration', type: 'number', isOptional: true },
+        { name: 'actual_duration', type: 'number', isOptional: true },
+        { name: 'workspace_id', type: 'string', isIndexed: true },
+        { name: 'parent_task_id', type: 'string', isOptional: true },
+        { name: 'project_id', type: 'string', isOptional: true, isIndexed: true },
+        { name: 'goal_id', type: 'string', isOptional: true, isIndexed: true },
+        { name: 'tags', type: 'string', isOptional: true }, // Watermelon: stringified JSON, Supabase: jsonb
+        { name: 'completed_at', type: 'number', isOptional: true }, // matches Supabase: number (timestamp)
+        { name: 'is_synced', type: 'boolean' }, // local-only
+        { name: 'task_uuid', type: 'string', isOptional: true },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
+        { name: 'recurrence', type: 'string', isOptional: true }, // local-only
+        { name: 'cross_links', type: 'string', isOptional: true }, // local-only
+        { name: 'slug', type: 'string', isOptional: true, isIndexed: true }, // local-only
+        { name: 'extra', type: 'string', isOptional: true }, // local-only
+      ]
+    }),
+    tableSchema({
+      name: 'goals',
+      columns: [
+        { name: 'title', type: 'string' },
+        { name: 'description', type: 'string', isOptional: true },
+        { name: 'status', type: 'string' }, // matches Supabase
+        { name: 'priority', type: 'string' }, // matches Supabase: string enum
+        { name: 'category', type: 'string' },
+        { name: 'target_date', type: 'number', isOptional: true }, // matches Supabase
+        { name: 'start_date', type: 'number', isOptional: true }, // matches Supabase
+        { name: 'completion_percentage', type: 'number' },
+        { name: 'workspace_id', type: 'string', isIndexed: true },
+        { name: 'parent_goal_id', type: 'string', isOptional: true },
+        { name: 'tags', type: 'string', isOptional: true }, // Watermelon: stringified JSON, Supabase: jsonb
+        { name: 'metrics', type: 'string', isOptional: true },
+        { name: 'completed_at', type: 'number', isOptional: true },
+        { name: 'is_synced', type: 'boolean' }, // local-only
+        { name: 'goal_uuid', type: 'string', isOptional: true },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
+        { name: 'slug', type: 'string', isOptional: true, isIndexed: true }, // local-only
+      ]
+    }),
+    tableSchema({
+      name: 'projects',
+      columns: [
+        { name: 'title', type: 'string' },
+        { name: 'description', type: 'string', isOptional: true },
+        { name: 'status', type: 'string' }, // matches Supabase
+        { name: 'priority', type: 'string' }, // matches Supabase: string enum
+        { name: 'category', type: 'string' },
+        { name: 'start_date', type: 'number', isOptional: true },
+        { name: 'target_completion_date', type: 'number', isOptional: true },
+        { name: 'actual_completion_date', type: 'number', isOptional: true },
+        { name: 'estimated_duration', type: 'number', isOptional: true },
+        { name: 'actual_duration', type: 'number', isOptional: true },
+        { name: 'completion_percentage', type: 'number' },
+        { name: 'workspace_id', type: 'string', isIndexed: true },
+        { name: 'goal_id', type: 'string', isOptional: true, isIndexed: true },
+        { name: 'tags', type: 'string', isOptional: true }, // Watermelon: stringified JSON, Supabase: jsonb
+        { name: 'milestones', type: 'string', isOptional: true },
+        { name: 'resources', type: 'string', isOptional: true },
+        { name: 'is_synced', type: 'boolean' }, // local-only
+        { name: 'project_uuid', type: 'string', isOptional: true },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
+        { name: 'slug', type: 'string', isOptional: true, isIndexed: true }, // local-only
+      ]
+    }),
+    tableSchema({
+      name: 'workspaces',
+      columns: [
+        { name: 'name', type: 'string' },
+        { name: 'type', type: 'string' },
+        { name: 'owner_id', type: 'string' },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
+        // Human-friendly identifier for debugging, admin UI, and cross-referencing
+        { name: 'slug', type: 'string', isOptional: true, isIndexed: true },
+      ]
+    }),
+    tableSchema({
+      name: 'workspace_members',
+      columns: [
+        { name: 'workspace_id', type: 'string', isIndexed: true },
+        { name: 'user_id', type: 'string' },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
+        // Human-friendly identifier for debugging, admin UI, and cross-referencing
+        { name: 'label', type: 'string', isOptional: true, isIndexed: true },
+      ]
+    }),
+    tableSchema({
+      name: 'clarifications',
+      columns: [
+        { name: 'workspace_id', type: 'string', isIndexed: true },
+        { name: 'proposer_id', type: 'string' },
+        { name: 'topic', type: 'string' },
+        { name: 'assumptions', type: 'string' }, // JSON string of assumptions array
+        { name: 'status', type: 'string' }, // 'pending', 'agreed', 'needs_discussion', 'cancelled'
+        { name: 'is_synced', type: 'boolean' },
+        { name: 'clarification_uuid', type: 'string', isOptional: true },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
+        // Human-friendly identifier for debugging, admin UI, and cross-referencing
+        { name: 'label', type: 'string', isOptional: true, isIndexed: true },
+      ]
+    }),
+    tableSchema({
+      name: 'clarification_responses',
+      columns: [
+        { name: 'clarification_id', type: 'string', isIndexed: true },
+        { name: 'responder_id', type: 'string' },
+        { name: 'assumption_index', type: 'number' },
+        { name: 'response_status', type: 'string' }, // 'agree', 'disagree', 'needs_discussion'
+        { name: 'is_synced', type: 'boolean' },
+        { name: 'response_uuid', type: 'string', isOptional: true },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
+        // Human-friendly identifier for debugging, admin UI, and cross-referencing
+        { name: 'label', type: 'string', isOptional: true, isIndexed: true },
+      ]
+    }),
+    tableSchema({
+      name: 'communication_modes',
+      columns: [
+        { name: 'workspace_id', type: 'string', isIndexed: true },
+        { name: 'current_mode', type: 'string' }, // 'normal', 'careful', 'emergency_break', 'mediated'
+        { name: 'state_display', type: 'string' }, // 'calm', 'tense', 'paused'
+        { name: 'state_color', type: 'string' }, // 'green', 'yellow', 'red'
+        { name: 'active_topic', type: 'string', isOptional: true },
+        { name: 'timeout_end', type: 'number', isOptional: true },
+        { name: 'last_break_timestamp', type: 'number', isOptional: true },
+        { name: 'break_count_today', type: 'number' },
+        { name: 'partner_acknowledged', type: 'boolean' },
+        { name: 'auto_detection_enabled', type: 'boolean' },
+        { name: 'pattern_confidence', type: 'number' },
+        { name: 'is_synced', type: 'boolean' },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
+        // Human-friendly identifier for debugging, admin UI, and cross-referencing
+        { name: 'label', type: 'string', isOptional: true, isIndexed: true },
+      ]
+    }),
+    // ...add similar for any future/join tables...
+  ]
+});
+
+/*
+ * =====================
+ * HUMAN-FRIENDLY IDENTIFIERS (slugs/labels)
+ * =====================
+ * - Every table has a `slug` or `label` for developer/ADHD-friendly debugging, review, and UI.
+ * - Format: <table>-<meaningful>-<id> (e.g., 'sample-task-1', 'alice-dev', 'workspace-member-<id>')
+ * - Always unique and indexed. Used for admin/debug panels, URLs, and cross-table joins.
+ * - See add_human_friendly_identifiers.sql for migration and conventions.
+ * - All new records must have a human-friendly slug/label. Run the post-seed validation SQL to ensure no missing slugs/labels.
+ */
+
+/**
+ * =====================
+ * PROJECT ROLES & RESPONSIBILITIES
+ * =====================
+ *
+ * COO: Sets business priorities, defines minimum viable goals, and directs the CTO. Ensures the product delivers value and aligns with user needs.
+ * CTO: Owns technical execution, maintains schema integrity, documents all changes, and ensures all schema/architecture work is traceable and auditable. Follows COO direction and keeps this file as the single source of truth.
+ * AI/Human Agents: Must read this section before making changes. Always update this file with new goals, roles, and next steps. Never make undocumented changes.
+ *
+ * =====================
+ * PROJECT GOALS & RAISON D’ÊTRE
+ * =====================
+ *
+ * Raison d’être: Build a robust, extensible, and human-friendly productivity and collaboration platform (Life Command) that supports personal and team workflows, healthy communication, and analytics-ready data. All schema and architecture must be clear, auditable, and easy for both AI and human maintainers to extend.
+ *
+ * Short-Term Minimum Viable Goal: Complete and enforce the universal slug/label convention across all tables, utilities, and admin tools. Ensure all schema changes are documented here, and all deletions are logged in SCHEMA_DELETIONS_LOG.md. Expose slugs/labels in the admin UI and automate validation.
+ *
+ * =====================
+ * NEXT STEPS / OPEN TASKS
+ * =====================
+ *
+ * 1. Maintain slug/label convention for all tables (see below for details).
+ * 2. Log all schema deletions in SCHEMA_DELETIONS_LOG.md.
+ * 3. Standardize slug/label generation utility and document usage.
+ * 4. Expose slugs/labels in admin/debug UI.
+ * 5. Automate validation and add CI checks for slugs/labels.
+ * 6. Keep this section updated with new goals and priorities as directed by the COO.
+ *
+ * (Update this section as project priorities evolve.)
+ * =====================
+ * FILE PATHWAY & SCHEMA MAPPING (MANDATORY)
+ * =====================
+ *
+ * All actual UI/admin/debugging files are located in:
+ *   - HolleyPfotzerLifeCommand/components/ (UI components)
+ *   - HolleyPfotzerLifeCommand/services/ (business logic)
+ *   - HolleyPfotzerLifeCommand/types/ (TypeScript types)
+ *   - HolleyPfotzerLifeCommand/lib/db/ (utilities, schema, slug utils)
+ *   - .env, .env.*, and .gitignore files in HolleyPfotzerLifeCommand/ (canonical root, not tracked by git, must be provided by user if needed)
+ *
+ * The following file/path patterns DO NOT exist and should be avoided in searches and code:
+ *   - Any file or folder named 'admin' or 'debug'.
+ *   - Any file or folder named 'components' outside of HolleyPfotzerLifeCommand/components/.
+ *   - Any file or folder named 'ui' (unless explicitly added in the future).
+ *
+ * If a file is not found, consult this mapping and update it if the structure changes. If a config or environment file is missing, check .gitignore and prompt the user to provide it.
+ */
+
+/**
+ * =====================
+ * DATABASE SNAPSHOT FILES: EXPLANATION & AGENT PROTOCOL
+ * =====================
+ *
+ * There are now multiple types of database snapshot files, each with a specific purpose:
+ *
+ * 1. DATABASE_SNAPSHOT_DDL.sql
+ *    - Full schema (DDL) snapshot for migrations, schema diffs, and recreating the database structure.
+ *    - Generated with: pg_dump --schema-only --no-owner --no-privileges $DATABASE_URL > DATABASE_SNAPSHOT_DDL.sql
+ *
+ * 2. DATABASE_SNAPSHOT_COLUMNS.sql
+ *    - Human-readable table/column summary for onboarding, quick reference, and agent context.
+ *    - Generated with: SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema = 'public' ORDER BY table_name, ordinal_position;
+ *
+ * 3. DATABASE_SNAPSHOT_RELATIONSHIPS_PART1.sql
+ *    - Foreign key relationships snapshot: shows how tables are linked (source_table.column -> target_table.column).
+ *    - Generated with the foreign key query (see file for details).
+ *
+ * 4. DATABASE_SNAPSHOT_RELATIONSHIPS_PART2.sql
+ *    - Primary key columns snapshot: shows the main ID for every table.
+ *    - Generated with the primary key query (see file for details).
+ *
+ * =====================
+ * AGENT ONBOARDING PROTOCOL (AFTER CONTEXT RESET)
+ * =====================
+ *
+ * 1. Request the human to run and provide the output of:
+ *    - DATABASE_SNAPSHOT_COLUMNS.sql (for table/column summary)
+ *    - DATABASE_SNAPSHOT_RELATIONSHIPS_PART1.sql (for foreign key relationships)
+ *    - DATABASE_SNAPSHOT_RELATIONSHIPS_PART2.sql (for primary key columns)
+ *
+ * 2. Use these outputs to:
+ *    - Map all relationships and write/validate any SQL or migration scripts.
+ *    - Ensure all validation, admin, and onboarding tools are accurate and up-to-date.
+ *
+ * 3. Only request the DDL snapshot if a full migration or schema diff is needed.
+ */
+
+/*
+ * =====================
+ * ENVIRONMENT FILES & GITIGNORE PROTOCOL
+ * =====================
+ *
+ * - The app requires a `.env` file with Supabase and other secrets. This file must exist in HolleyPfotzerLifeCommand/ (the canonical project root). If running the web app from a different folder, ensure `.env` is present there as well.
+ * - `.env` and related files are always listed in `HolleyPfotzerLifeCommand/.gitignore` (or `.gitignore bak` if temporarily renamed for local-only work). Never commit `.env` or secrets to git or GitHub.
+ * - If you see `.gitignore bak`, you MUST rename it back to `.gitignore` before any commit, push, or linking to GitHub. This prevents accidental exposure of secrets.
+ * - To search for `.env` or `.gitignore` files, look in HolleyPfotzerLifeCommand/ (the canonical root).
+ * - For onboarding, see PROJECT_PLAYBOOK.md for step-by-step instructions on environment setup and secure file handling.
+ */
+
+/*
+ * =====================
+ * GITIGNORE/ENV FILE PROTOCOL
+ * =====================
+ * - If `.gitignore` is renamed, commented out, or otherwise disabled for local work, it is a MANDATORY step to restore it to its original state before any commit, push, or linking to GitHub.
+ * - Agents must check the state of `.gitignore` before any git operation and prompt the user to restore it if needed.
+ * - Never allow `.env` or other sensitive files to be committed or pushed to a remote repository.
+ */
+
+/**
+ * DOCKER COMPOSE CONFIGURATION
+ *
+ * The canonical docker-compose.yml for this project is located at:
+ *   HolleyPfotzerLifeCommand/docker-compose.yml
+ *
+ * This file is used for local development, automation, and E2E/component testing.
+ * Do NOT search for docker-compose.yml in parent folders or outside HolleyPfotzerLifeCommand/; always use the file above as the canonical source.
+ *
+ * If you need to run Playwright or other test suites, use:
+ *   docker-compose -f "HolleyPfotzerLifeCommand/docker-compose.yml" run --rm playwright
+ */
+
+// AUDIT: SCHEMA & FILE MAPPING (2025-07-04)
+//
+// This schema reflects the full project audit as of July 4, 2025. All table/file nomenclature, relationships, and protocols are up-to-date and match the current database and onboarding state.
+//
+// - All core tables (events, tasks, goals, projects, workspaces, workspace_members, clarifications, clarification_responses, communication_modes) are present and mapped.
+// - All tables have human-friendly `slug` or `label` columns for admin/debugging, as per universal convention.
+// - All relationships (foreign keys, primary keys) are documented in the snapshot files and reflected in this schema.
+// - File mapping and onboarding order are up-to-date and match the playbook.
+// - No undocumented or orphaned tables, columns, or files exist as of this audit.
+// - All agent and onboarding protocols are current and enforced.
+//
+// If any new tables, relationships, or files are added, update this section and the playbook accordingly.
+
+/**
+ * QUICK START / AGENT CHECKLIST
+ *
+ * 1. Read this file, then PROJECT_PLAYBOOK.md, then the latest database snapshot files (DDL, columns, relationships).
+ * 2. Confirm file mapping and onboarding order match across all docs.
+ * 3. Before making changes, check the "NEXT STEPS & OPEN TASKS" and log all actions/decisions.
+ * 4. After any change, update logs and mapping, and run validation scripts.
+ * 5. If you are unsure, add a question to the logs and proceed with caution.
+ * 6. For non-technical users: see the "For Humans" section in the playbook for help.
+ */
+
+/*
+ * =====================
+ * AUTOMATED SCHEMA DRIFT & FK VALIDATION (2025-07-04)
+ * =====================
+ *
+ * - Use `scripts/validateSchemaDrift.ts` to compare live DB FKs to canonical DDL after any migration or when drift is suspected.
+ * - This is a required part of the onboarding and audit protocol.
+ */
+
+/**
+ * 2025-07-06: E2E MOCK AUTH & CI SPLIT PROTOCOL
+ * ------------------------------------------------
+ * - E2E authentication and CI split-lane protocol are now standard for all test and deployment workflows.
+ * - See PROJECT_PLAYBOOK.md and src/types/supabase.ts for details on:
+ *     - MockAuthProvider, test user seeding, and E2E-only RLS
+ *     - Split CI jobs (mock auth on/off), Yarn-only install, and dependency pinning
+ * - All new test protocols, CI changes, or auth providers must be documented in both this file and the playbook.
+ * - If onboarding or CI/test instructions change, update this header and the playbook immediately.
+ */
+
+/*
+ * =====================
+ * WATERMELONDB MIGRATION PROTOCOL (2025-07-06)
+ * =====================
+ *
+ * - WatermelonDB migrations are handled automatically at app startup.
+ * - To apply a migration:
+ *     1. Bump the schema version in this file (lib/db/schema.ts).
+ *     2. Add a migration file in lib/db/migrations/ using schemaMigrations from @nozbe/watermelondb.
+ *     3. Launch the app (web or native). WatermelonDB will detect the version bump and run the migration automatically.
+ *     4. Migration errors (if any) will appear in the app logs/console at startup.
+ * - There is NO CLI or yarn script for running WatermelonDB migrations (e.g., `yarn watermelon migrate` does not exist).
+ * - If you are unsure, see this section or check PROJECT_PLAYBOOK.md for protocol updates.
+ * - Never ask the user how to run a migration—refer to this protocol and foundational docs.
  */

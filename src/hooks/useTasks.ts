@@ -14,7 +14,7 @@ export function useTasks() {
     };
 
     const removeTask = (taskToRemove: Task) => {
-        setTasks(tasks.filter((t) => t.id !== taskToRemove.id));
+        setTasks(tasks.filter((t: Task) => t.id !== taskToRemove.id));
     };
 
     return {

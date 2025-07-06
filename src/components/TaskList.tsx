@@ -11,6 +11,10 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks, loading }) => {
   if (loading) {
     return <div>Loading tasks...</div>;
   }
+  // guard against undefined or non-array tasks
+  if (!Array.isArray(tasks)) {
+    return <div>Loading tasks...</div>;
+  }
   if (tasks.length === 0) {
     return <div>No tasks yet.</div>;
   }
