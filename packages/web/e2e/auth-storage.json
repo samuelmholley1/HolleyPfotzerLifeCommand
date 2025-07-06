@@ -1,0 +1,45 @@
+{
+  "cookies": [
+    {
+      "name": "sb-nztnugncfiauygvywyoz-auth-token-code-verifier",
+      "value": "base64-IjkyZWFiNjZmZGIyNDRkZTM3ZDdiZDU4ZjVlOGVhOGJlZjdlYTk0ZTdlZmYyODUwOTMxZmVjYWJkMmIwOTE1MTAyZTVmMmQzYzUzYmMzMmY2NTBmYmY3ZDk1MjY5ZGIxMzEwMjk3ZWM2Y2NmNGFmNDAi",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1786397218.729124,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "__Host-GAPS",
+      "value": "1:cVWxcA23BQZmPHS3bTKwKgnGNHwykg:R71lrglDZA3xCksK",
+      "domain": "accounts.google.com",
+      "path": "/",
+      "expires": 1786397219.461316,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "OTZ",
+      "value": "8158887_84_88_104280_84_446940",
+      "domain": "accounts.google.com",
+      "path": "/",
+      "expires": 1754429221,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "NID",
+      "value": "525=bg0bnt1XHD52jXDQGUk28OCa23ZJzFbST7lL5xjjnykne0zlJYosBs2BjIp7lt7HRjjRX0UT5II-ZtUqLkqTyTGPbM5OJB_d9eMjSZ-dTmGeUaT05S8SeFATvcvPH1yhVL-jqpWBAHHyUK8MBgSaPmkEDWt1FwcTNCRymY4wSM_REUxS51CY_RtNcXDPNrWAs6Savgg",
+      "domain": ".google.com",
+      "path": "/",
+      "expires": 1767648421.732826,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    }
+  ],
+  "origins": []
+}
