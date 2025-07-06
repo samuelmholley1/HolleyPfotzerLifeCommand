@@ -70,3 +70,5 @@ export interface TaskStats {
   medium_priority: number;
   low_priority: number;
 }
+
+export type RecurrenceRule = any;
