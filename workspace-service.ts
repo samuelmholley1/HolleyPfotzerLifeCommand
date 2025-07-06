@@ -101,7 +101,7 @@ export class WorkspaceService {
         // Update their profile to set this as active workspace
         await supabase
           .from('profiles')
-          .update({ active_workspace_id: workspace.id })
+          .update({ active_workspace_id: workspace[0].id })
           .eq('id', (await supabase.auth.getUser()).data.user?.id);
 
         return { data: workspace, error: null };
