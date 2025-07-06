@@ -10,3 +10,7 @@ export type CreateTaskInput = {
 import { Database } from '../supabase';
 export type Task = Database['public']['Tables']['tasks']['Row'];
 // ----------------------------------------------------------------------
+// — auto-added July 6 2025 —
+// Re-export Supabase row shape so front-end imports work.
+import { Database } from '../supabase';
+export type Task = Database['public']['Tables']['tasks']['Row'];
