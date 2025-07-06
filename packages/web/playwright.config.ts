@@ -15,7 +15,7 @@ export default defineConfig({
     cwd: __dirname,
     command: 'yarn dev',
     url: baseURL,
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 120000,
   },
 });

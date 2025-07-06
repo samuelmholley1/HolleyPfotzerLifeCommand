@@ -136,3 +136,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+console.log('AuthContext E2E flag:', process.env.NEXT_PUBLIC_PW_E2E);
