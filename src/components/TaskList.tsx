@@ -1,11 +1,6 @@
 "use client";
 import React from "react";
-
-type Task = {
-  id: string;
-  title: string;
-  status: string;
-};
+import { Task } from '../types/tasks';
 
 interface TaskListProps {
   tasks: Task[];
@@ -24,6 +19,7 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks, loading }) => {
       {tasks.map((task) => (
         <li key={task.id} style={{ padding: '8px', borderBottom: '1px solid #ccc' }}>
           <strong>{task.title}</strong> — <span>{task.status}</span>
+          <p className="text-sm text-gray-600 mt-1">Priority: {task.priority || 'N/A'}</p>
         </li>
       ))}
     </ul>

@@ -3,13 +3,7 @@ import { TaskForm } from '../components/TaskForm';
 import { TaskList } from '../components/TaskList';
 import { taskService } from '../services/taskService';
 import React, { useEffect, useState } from 'react';
-
-// Define the Task type based on our schema
-type Task = {
-  id: string;
-  title: string;
-  status: string;
-};
+import { Task } from '../types/tasks';
 
 export default function HomePage() {
   const [tasks, setTasks] = useState<Task[]>([]);
