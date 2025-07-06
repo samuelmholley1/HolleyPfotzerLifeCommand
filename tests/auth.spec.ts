@@ -5,8 +5,7 @@ import { test, expect } from '@playwright/test';
 // If not, you may need to explicitly use await page.goto('http://localhost:3000'); instead of page.goto('/');
 
 test.describe('Authentication Flow', () => {
-
-  test('should allow a user to sign in and sign out', async ({ page }) => {
+  test('should allow a user to sign in and sign out (manual, headed mode)', async ({ page }) => {
     // Navigate to the base URL of the application.
     // Assumes 'baseURL' is set in playwright.config.ts.
     await page.goto('/');
@@ -51,5 +50,14 @@ test.describe('Authentication Flow', () => {
     console.log('Successfully signed out. Sign In button visible again.');
 
     console.log('Authentication test completed successfully.');
+  });
+
+  test('should show authenticated state using storageState', async ({ page, context }) => {
+    // This test assumes storageState is loaded (see playwright.config.ts)
+    await page.goto('/');
+    // Should see the Sign Out button immediately if authenticated
+    const signOutButton = page.getByRole('button', { name: /Sign Out/i });
+    await expect(signOutButton).toBeVisible();
+    // Optionally, test post-auth flows (e.g., create a task)
   });
 });

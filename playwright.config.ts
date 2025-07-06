@@ -19,6 +19,7 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'on',
     video: 'retain-on-failure',
+    storageState: './tests/auth-storage.json', // Use pre-authenticated state for E2E auth tests
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
