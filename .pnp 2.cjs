@@ -33,7 +33,6 @@ const RAW_RUNTIME_STATE =
           ["@playwright/test", "npm:1.53.2"],\
           ["@react-native-google-signin/google-signin", "virtual:c90bed18643b4444baba757536e5902e7bbc426c894d8ddc74f8dcb51a99a3bc3da5236c726f707758002495d5c2160ebc734881ef1c8160f0f1d689e17bb508#npm:15.0.0"],\
           ["@signalapp/libsignal-client", "npm:0.76.3"],\
-          ["@supabase/ssr", "virtual:c90bed18643b4444baba757536e5902e7bbc426c894d8ddc74f8dcb51a99a3bc3da5236c726f707758002495d5c2160ebc734881ef1c8160f0f1d689e17bb508#npm:0.6.1"],\
           ["@supabase/supabase-js", "npm:2.50.3"],\
           ["@types/node", "npm:24.0.10"],\
           ["@types/react", "npm:19.1.8"],\
@@ -1365,29 +1364,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["@supabase/ssr", [\
-      ["npm:0.6.1", {\
-        "packageLocation": "../../../../.yarn/berry/cache/@supabase-ssr-npm-0.6.1-d095597c62-10c0.zip/node_modules/@supabase/ssr/",\
-        "packageDependencies": [\
-          ["@supabase/ssr", "npm:0.6.1"]\
-        ],\
-        "linkType": "SOFT"\
-      }],\
-      ["virtual:c90bed18643b4444baba757536e5902e7bbc426c894d8ddc74f8dcb51a99a3bc3da5236c726f707758002495d5c2160ebc734881ef1c8160f0f1d689e17bb508#npm:0.6.1", {\
-        "packageLocation": "./.yarn/__virtual__/@supabase-ssr-virtual-c2b8f09da6/5/.yarn/berry/cache/@supabase-ssr-npm-0.6.1-d095597c62-10c0.zip/node_modules/@supabase/ssr/",\
-        "packageDependencies": [\
-          ["@supabase/ssr", "virtual:c90bed18643b4444baba757536e5902e7bbc426c894d8ddc74f8dcb51a99a3bc3da5236c726f707758002495d5c2160ebc734881ef1c8160f0f1d689e17bb508#npm:0.6.1"],\
-          ["@supabase/supabase-js", "npm:2.50.3"],\
-          ["@types/supabase__supabase-js", null],\
-          ["cookie", "npm:1.0.2"]\
-        ],\
-        "packagePeers": [\
-          "@supabase/supabase-js",\
-          "@types/supabase__supabase-js"\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["@supabase/storage-js", [\
       ["npm:2.7.1", {\
         "packageLocation": "../../../../.yarn/berry/cache/@supabase-storage-js-npm-2.7.1-92ca6f0bb0-10c0.zip/node_modules/@supabase/storage-js/",\
@@ -2443,15 +2419,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../.yarn/berry/cache/convert-source-map-npm-2.0.0-7ab664dc4e-10c0.zip/node_modules/convert-source-map/",\
         "packageDependencies": [\
           ["convert-source-map", "npm:2.0.0"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["cookie", [\
-      ["npm:1.0.2", {\
-        "packageLocation": "../../../../.yarn/berry/cache/cookie-npm-1.0.2-7a4273d897-10c0.zip/node_modules/cookie/",\
-        "packageDependencies": [\
-          ["cookie", "npm:1.0.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -3845,7 +3812,6 @@ const RAW_RUNTIME_STATE =
           ["@playwright/test", "npm:1.53.2"],\
           ["@react-native-google-signin/google-signin", "virtual:c90bed18643b4444baba757536e5902e7bbc426c894d8ddc74f8dcb51a99a3bc3da5236c726f707758002495d5c2160ebc734881ef1c8160f0f1d689e17bb508#npm:15.0.0"],\
           ["@signalapp/libsignal-client", "npm:0.76.3"],\
-          ["@supabase/ssr", "virtual:c90bed18643b4444baba757536e5902e7bbc426c894d8ddc74f8dcb51a99a3bc3da5236c726f707758002495d5c2160ebc734881ef1c8160f0f1d689e17bb508#npm:0.6.1"],\
           ["@supabase/supabase-js", "npm:2.50.3"],\
           ["@types/node", "npm:24.0.10"],\
           ["@types/react", "npm:19.1.8"],\
