@@ -1,10 +1,11 @@
 "use client";
 
-import { useAuthContext } from '../hooks/useAuthContext';
-import { useEffect, useState } from 'react';
-import TaskForm from '../components/TaskForm';
-import TaskList from '../components/TaskList';
-import { Task } from '../types';
+import { TaskForm } from '@/components/TaskForm';
+import { TaskList } from '@/components/TaskList';
+import { useAuthContext } from '@/hooks/useAuthContext';
+import React, { useEffect, useState, useCallback } from 'react';
+import { taskService } from '@/services/taskService';
+import { Task } from '@/types/tasks';
 
 export default function HomePage() {
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuthContext();
