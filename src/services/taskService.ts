@@ -1,33 +1,55 @@
-// This is a placeholder service. In a real app, this would interact with your database client (e.g., Supabase).
-// For now, it makes fetch requests to our API routes.
+import { createClient } from '../lib/supabase/client';
+import { Task } from '../types/tasks';
 
-const API_BASE_URL = '/api'; // Assumes the API routes are served from the same origin
-
-type TaskData = {
-  title: string;
-  [key: string]: any; // Allows for extra fields
-};
+// Define the shape of the data needed to create a task.
+// This makes our function calls type-safe and explicit.
+// We only need the title and workspaceId to create a basic task.
+export type CreateTaskPayload = Pick<Task, 'title' | 'workspaceId'>;
 
 export const taskService = {
-  getTasksSimple: async () => {
-    const response = await fetch(`${API_BASE_URL}/tasks`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch tasks');
+  /**
+   * Fetches all tasks for a given workspace.
+   * @param workspaceId The UUID of the workspace to fetch tasks from.
+   */
+  getTasks: async (workspaceId: string): Promise<Task[]> => {
+    const supabase = createClient();
+    const { data: tasks, error } = await supabase
+      .from('tasks')
+      .select('*') // Selects all columns
+      .eq('workspace_id', workspaceId) // Filters by the provided workspace ID
+      .order('created_at', { ascending: false }); // Show newest tasks first
+
+    if (error) {
+      console.error('Error fetching tasks:', error.message);
+      throw new Error('Failed to fetch tasks from the database.');
     }
-    return response.json();
+
+    return tasks || [];
   },
 
-  createTaskSimple: async (taskData: TaskData) => {
-    const response = await fetch(`${API_BASE_URL}/tasks`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(taskData),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to create task');
+  /**
+   * Creates a new task.
+   * @param payload An object containing the required data to create a task.
+   */
+  createTask: async (payload: CreateTaskPayload): Promise<Task> => {
+    const supabase = createClient();
+    // The user_id is automatically set by the database (DEFAULT auth.uid()).
+    // We only need to provide the required fields from our payload.
+    const { data: newTask, error } = await supabase
+      .from('tasks')
+      .insert(payload)
+      .select() // Return the newly created record
+      .single(); // Expect only one record to be returned
+
+    if (error) {
+      console.error('Error creating task:', error.message);
+      throw new Error('Failed to create the task in the database.');
     }
-    return response.json();
+    
+    if (!newTask) {
+      throw new Error('Task creation did not return the new task.');
+    }
+
+    return newTask;
   },
 };
