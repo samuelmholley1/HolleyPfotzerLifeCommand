@@ -72,3 +72,4 @@ export interface TaskStats {
 }
 
 export type RecurrenceRule = any;
+export type CrossLink = any;
