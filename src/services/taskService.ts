@@ -1,6 +1,6 @@
 import { createClient } from '../lib/supabase/client';
 import { Task } from '../types/tasks';
-import { Database } from '../supabase';
+import { Database } from '@/supabase';
 
 type TaskInsert = Database['public']['Tables']['tasks']['Insert'];
 
