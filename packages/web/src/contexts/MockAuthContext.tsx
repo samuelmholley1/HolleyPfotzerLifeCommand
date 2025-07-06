@@ -20,22 +20,13 @@ export const MockAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
   if (process.env.NODE_ENV === 'production') {
     throw new Error('MockAuthProvider must never run in production!');
   }
-  if (process.env.NEXT_PUBLIC_USE_MOCK_AUTH !== 'true') {
-    throw new Error('MockAuthProvider requires NEXT_PUBLIC_USE_MOCK_AUTH=true');
-  }
-  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_PW_E2E === '1') {
+  if (
+    process.env.NEXT_PUBLIC_PW_E2E === '1' ||
+    process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true'
+  ) {
     return <div data-testid="stub-authenticated">E2E User</div>;
   }
-  return (
-    <MockAuthContext.Provider value={{
-      user: MOCK_USER,
-      loading: false,
-      signInWithGoogle: async () => {},
-      signOut: async () => {},
-    }}>
-      {children}
-    </MockAuthContext.Provider>
-  );
+  throw new Error('MockAuthProvider requires NEXT_PUBLIC_USE_MOCK_AUTH=true or E2E');
 };
 
 export const useMockAuth = () => useContext(MockAuthContext);
