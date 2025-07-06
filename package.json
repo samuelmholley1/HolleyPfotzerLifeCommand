@@ -1,0 +1,19 @@
+{
+  "name": "holley-pfotzer-life-command-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "yarn workspace web next dev",
+    "build:web": "yarn workspace web next build",
+    "dev:native": "yarn workspace native expo start",
+    "lint": "yarn workspaces foreach run lint",
+    "ci": "yarn workspaces foreach --topological-dev run ci",
+    "test": "yarn workspaces foreach run test"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
