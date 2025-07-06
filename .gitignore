@@ -73,8 +73,4 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-
-# Web build
-dist/
-*.tsbuildinfo
-.next
+.pnp.*
