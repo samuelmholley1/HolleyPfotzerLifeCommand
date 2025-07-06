@@ -15,10 +15,11 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://app:3000',
+    baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'on',
     video: 'retain-on-failure',
+    storageState: './tests/auth-storage.json', // Use pre-authenticated state for E2E auth tests
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

@@ -129,7 +129,7 @@
 import { appSchema, tableSchema } from '@nozbe/watermelondb';
 
 export const schema = appSchema({
-  version: 11, // Bump version for migration
+  version: 12, // Updated to Schema v12 - aligned with Supabase migration 20250705, see supabase.ts.
   tables: [
     tableSchema({
       name: 'events',
@@ -150,28 +150,26 @@ export const schema = appSchema({
       columns: [
         { name: 'title', type: 'string' },
         { name: 'description', type: 'string', isOptional: true },
-        { name: 'status', type: 'string' }, // 'pending', 'in_progress', 'completed', 'cancelled'
-        { name: 'priority', type: 'string' }, // 'low', 'medium', 'high', 'urgent'
-        { name: 'category', type: 'string' }, // 'work', 'health', 'personal', 'strategy'
-        { name: 'due_date', type: 'number', isOptional: true },
-        { name: 'estimated_duration', type: 'number', isOptional: true }, // minutes
+        { name: 'status', type: 'string' }, // matches Supabase: string enum
+        { name: 'priority', type: 'number' }, // matches Supabase: number enum
+        { name: 'category', type: 'string' },
+        { name: 'due_date', type: 'number', isOptional: true }, // matches Supabase: number (timestamp)
+        { name: 'estimated_duration', type: 'number', isOptional: true },
         { name: 'actual_duration', type: 'number', isOptional: true },
         { name: 'workspace_id', type: 'string', isIndexed: true },
-        { name: 'parent_task_id', type: 'string', isOptional: true }, // for subtasks
+        { name: 'parent_task_id', type: 'string', isOptional: true },
         { name: 'project_id', type: 'string', isOptional: true, isIndexed: true },
         { name: 'goal_id', type: 'string', isOptional: true, isIndexed: true },
-        { name: 'tags', type: 'string', isOptional: true }, // JSON array
-        { name: 'completed_at', type: 'number', isOptional: true },
-        { name: 'is_synced', type: 'boolean' },
+        { name: 'tags', type: 'string', isOptional: true }, // Watermelon: stringified JSON, Supabase: jsonb
+        { name: 'completed_at', type: 'number', isOptional: true }, // matches Supabase: number (timestamp)
+        { name: 'is_synced', type: 'boolean' }, // local-only
         { name: 'task_uuid', type: 'string', isOptional: true },
         { name: 'created_at', type: 'number' },
         { name: 'updated_at', type: 'number' },
-        { name: 'recurrence', type: 'string', isOptional: true }, // JSON: { freq, interval, byweekday, until, count, ... }
-        { name: 'cross_links', type: 'string', isOptional: true }, // JSON array for crossweaving (symptoms, events, etc)
-        // Human-friendly identifier for debugging, admin UI, and cross-referencing
-        { name: 'slug', type: 'string', isOptional: true, isIndexed: true },
-        // Added for future extensibility (arbitrary JSON)
-        { name: 'extra', type: 'string', isOptional: true },
+        { name: 'recurrence', type: 'string', isOptional: true }, // local-only
+        { name: 'cross_links', type: 'string', isOptional: true }, // local-only
+        { name: 'slug', type: 'string', isOptional: true, isIndexed: true }, // local-only
+        { name: 'extra', type: 'string', isOptional: true }, // local-only
       ]
     }),
     tableSchema({
@@ -179,23 +177,22 @@ export const schema = appSchema({
       columns: [
         { name: 'title', type: 'string' },
         { name: 'description', type: 'string', isOptional: true },
-        { name: 'status', type: 'string' }, // 'draft', 'active', 'on_hold', 'completed', 'cancelled'
-        { name: 'priority', type: 'string' }, // 'low', 'medium', 'high', 'critical'
-        { name: 'category', type: 'string' }, // 'health', 'career', 'financial', 'personal', 'relationships', 'learning'
-        { name: 'target_date', type: 'number', isOptional: true },
-        { name: 'start_date', type: 'number', isOptional: true },
-        { name: 'completion_percentage', type: 'number' }, // 0-100
+        { name: 'status', type: 'string' }, // matches Supabase
+        { name: 'priority', type: 'string' }, // matches Supabase: string enum
+        { name: 'category', type: 'string' },
+        { name: 'target_date', type: 'number', isOptional: true }, // matches Supabase
+        { name: 'start_date', type: 'number', isOptional: true }, // matches Supabase
+        { name: 'completion_percentage', type: 'number' },
         { name: 'workspace_id', type: 'string', isIndexed: true },
-        { name: 'parent_goal_id', type: 'string', isOptional: true }, // for sub-goals
-        { name: 'tags', type: 'string', isOptional: true }, // JSON array
-        { name: 'metrics', type: 'string', isOptional: true }, // JSON object for tracking progress
+        { name: 'parent_goal_id', type: 'string', isOptional: true },
+        { name: 'tags', type: 'string', isOptional: true }, // Watermelon: stringified JSON, Supabase: jsonb
+        { name: 'metrics', type: 'string', isOptional: true },
         { name: 'completed_at', type: 'number', isOptional: true },
-        { name: 'is_synced', type: 'boolean' },
+        { name: 'is_synced', type: 'boolean' }, // local-only
         { name: 'goal_uuid', type: 'string', isOptional: true },
         { name: 'created_at', type: 'number' },
         { name: 'updated_at', type: 'number' },
-        // Human-friendly identifier for debugging, admin UI, and cross-referencing
-        { name: 'slug', type: 'string', isOptional: true, isIndexed: true },
+        { name: 'slug', type: 'string', isOptional: true, isIndexed: true }, // local-only
       ]
     }),
     tableSchema({
@@ -203,26 +200,25 @@ export const schema = appSchema({
       columns: [
         { name: 'title', type: 'string' },
         { name: 'description', type: 'string', isOptional: true },
-        { name: 'status', type: 'string' }, // 'planning', 'active', 'on_hold', 'completed', 'cancelled'
-        { name: 'priority', type: 'string' }, // 'low', 'medium', 'high', 'urgent'
-        { name: 'category', type: 'string' }, // 'work', 'personal', 'health', 'learning', 'side_project'
+        { name: 'status', type: 'string' }, // matches Supabase
+        { name: 'priority', type: 'string' }, // matches Supabase: string enum
+        { name: 'category', type: 'string' },
         { name: 'start_date', type: 'number', isOptional: true },
         { name: 'target_completion_date', type: 'number', isOptional: true },
         { name: 'actual_completion_date', type: 'number', isOptional: true },
-        { name: 'estimated_duration', type: 'number', isOptional: true }, // total estimated hours
-        { name: 'actual_duration', type: 'number', isOptional: true }, // total actual hours
-        { name: 'completion_percentage', type: 'number' }, // 0-100
+        { name: 'estimated_duration', type: 'number', isOptional: true },
+        { name: 'actual_duration', type: 'number', isOptional: true },
+        { name: 'completion_percentage', type: 'number' },
         { name: 'workspace_id', type: 'string', isIndexed: true },
-        { name: 'goal_id', type: 'string', isOptional: true, isIndexed: true }, // link to parent goal
-        { name: 'tags', type: 'string', isOptional: true }, // JSON array
-        { name: 'milestones', type: 'string', isOptional: true }, // JSON array of milestone objects
-        { name: 'resources', type: 'string', isOptional: true }, // JSON array of resource links/notes
-        { name: 'is_synced', type: 'boolean' },
+        { name: 'goal_id', type: 'string', isOptional: true, isIndexed: true },
+        { name: 'tags', type: 'string', isOptional: true }, // Watermelon: stringified JSON, Supabase: jsonb
+        { name: 'milestones', type: 'string', isOptional: true },
+        { name: 'resources', type: 'string', isOptional: true },
+        { name: 'is_synced', type: 'boolean' }, // local-only
         { name: 'project_uuid', type: 'string', isOptional: true },
         { name: 'created_at', type: 'number' },
         { name: 'updated_at', type: 'number' },
-        // Human-friendly identifier for debugging, admin UI, and cross-referencing
-        { name: 'slug', type: 'string', isOptional: true, isIndexed: true },
+        { name: 'slug', type: 'string', isOptional: true, isIndexed: true }, // local-only
       ]
     }),
     tableSchema({
@@ -467,4 +463,15 @@ export const schema = appSchema({
  *
  * - Use `scripts/validateSchemaDrift.ts` to compare live DB FKs to canonical DDL after any migration or when drift is suspected.
  * - This is a required part of the onboarding and audit protocol.
+ */
+
+/**
+ * 2025-07-06: E2E MOCK AUTH & CI SPLIT PROTOCOL
+ * ------------------------------------------------
+ * - E2E authentication and CI split-lane protocol are now standard for all test and deployment workflows.
+ * - See PROJECT_PLAYBOOK.md and src/types/supabase.ts for details on:
+ *     - MockAuthProvider, test user seeding, and E2E-only RLS
+ *     - Split CI jobs (mock auth on/off), Yarn-only install, and dependency pinning
+ * - All new test protocols, CI changes, or auth providers must be documented in both this file and the playbook.
+ * - If onboarding or CI/test instructions change, update this header and the playbook immediately.
  */

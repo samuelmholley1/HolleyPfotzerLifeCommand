@@ -1,6 +1,9 @@
 import React from 'react';
 import { AuthProvider } from '../contexts/AuthContext';
+import { MockAuthProvider } from '../contexts/MockAuthContext';
 import './globals.css';
+
+const useMock = process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true' && process.env.NODE_ENV !== 'production';
 
 export default function RootLayout({
   children,
@@ -10,9 +13,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        {useMock ? (
+          <MockAuthProvider>{children}</MockAuthProvider>
+        ) : (
+          <AuthProvider>{children}</AuthProvider>
+        )}
       </body>
     </html>
   );

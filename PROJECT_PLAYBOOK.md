@@ -732,7 +732,7 @@ INSERT INTO tasks (
 2. **React Components (BLOCKING):**
    - `src/components/TaskList.tsx` - **MISSING** (Referenced in Dashboard.tsx line 21)
    - `src/components/TaskForm.tsx` - **MISSING** (Referenced in Dashboard.tsx line 22)
-   - Entire `src/components/` directory structure - **MISSING**
+   - Entire `src/components/` directory - **MISSING**
 
 3. **Next.js Application Structure (BLOCKING):**
    - `pages/` directory OR `app/` directory - **MISSING**
@@ -785,3 +785,33 @@ INSERT INTO tasks (
 - 2025-07-04: Task model updated to include slug field (lib/db/Task.ts).
 - 2025-07-04: TaskCard updated to display slug for admin/debugging (components/tasks/TaskCard.tsx).
 - 2025-07-05: Core data models (Task, Project, Goal) strictly defined in TypeScript with workspaceId for multi-workspace support. All MVP data models now strictly typed and documented in /types/ directory.
+- 2025-07-05: Implemented Playwright storageState protocol for E2E auth. Updated config, test, and documentation. (AI)
+
+---
+
+## TESTING & CI: MOCK AUTH PROVIDER (2025-07-05)
+
+### Jest Setup
+- Added `jest.setup.ts` to globally import `@testing-library/jest-dom` matchers for all tests.
+- Configured `jest.config.js` with `setupFilesAfterEnv: ['<rootDir>/jest.setup.ts']`.
+
+### Coverage Baseline
+- As of PR `feat(mock-auth): provider + env switch + full test suite`:
+  - **Statements:** 92.3 %
+  - **Lines:** 90 %
+
+### Pinned DevDependencies for CI Determinism
+- All new devDependencies are pinned to exact versions:
+  - `@testing-library/react@14.1.2`
+  - `@testing-library/jest-dom@6.1.6`
+  - `ts-jest@29.1.1`
+  - `@types/jest@30.0.0`
+  - `@types/node@<current>`
+  - `jest-environment-jsdom@29.7.0`
+- See `package.json` for full list and lockfile for resolved versions.
+
+### Mock Auth Testing Protocol
+- MockAuthProvider is used for E2E and unit tests, never in production.
+- Environment-based switching is enforced in `src/app/layout.tsx`.
+- Unit tests in `src/contexts/MockAuthContext.test.tsx` verify provider behavior and user context.
+- CI split: “E2E-MockAuth” (flag on) and “Build-ProdConfig” (flag off) jobs, with secrets masked.
