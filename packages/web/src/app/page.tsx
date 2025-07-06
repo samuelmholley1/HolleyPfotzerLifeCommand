@@ -105,6 +105,9 @@ function HomePageContent() {
 
   return (
     <main style={{ fontFamily: 'sans-serif', padding: '2rem' }}>
+      <div style={{ background: 'yellow', padding: '8px', marginBottom: '1rem', fontWeight: 'bold' }}>
+        E2E Flag: {process.env.NEXT_PUBLIC_PW_E2E || 'unset'}, MockAuth: {process.env.NEXT_PUBLIC_USE_MOCK_AUTH || 'unset'}
+      </div>
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
         <h1>Task MVP</h1>
         <div>
