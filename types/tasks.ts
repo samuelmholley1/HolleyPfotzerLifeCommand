@@ -2,6 +2,7 @@ export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'deferred' | 
 
 export interface Task {
   id: string; // UUID
+  workspaceId: string; // Foreign key to Workspace
   createdAt: string; // ISO 8601 timestamp
   updatedAt: string; // ISO 8601 timestamp
   title: string;

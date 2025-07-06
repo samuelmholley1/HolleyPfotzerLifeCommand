@@ -4,6 +4,7 @@ export type GoalStatus = 'proposed' | 'active' | 'achieved' | 'abandoned';
 
 export interface Goal {
   id: string; // UUID
+  workspaceId: string; // Foreign key to Workspace
   createdAt: string; // ISO 8601 timestamp
   updatedAt: string; // ISO 8601 timestamp
   title: string;
