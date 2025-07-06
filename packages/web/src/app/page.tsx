@@ -108,6 +108,17 @@ function HomePageContent() {
     </>;
   }
 
+  // Always render TaskForm in E2E mode, otherwise gate by user
+  if (process.env.NEXT_PUBLIC_PW_E2E === '1' || user) {
+    return (
+      <main style={{ fontFamily: 'sans-serif', padding: '2rem' }}>
+        <h1>Task MVP</h1>
+        <TaskForm onCreate={handleCreateTask} />
+        {error && <div style={{color: 'red', marginTop: '1rem'}}>{error}</div>}
+        <TaskList tasks={tasks} loading={loadingTasks} />
+      </main>
+    );
+  }
   // Always render TaskForm and TaskList in E2E mode
   if (!user && process.env.NEXT_PUBLIC_PW_E2E !== '1') {
     return (
@@ -125,7 +136,7 @@ function HomePageContent() {
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
         <h1>Task MVP</h1>
         <div>
-            <span style={{marginRight: '1rem'}}>Welcome, {user?.name || user?.email || 'E2E User'}</span>
+            <span style={{marginRight: '1rem'}}>Welcome, {user && typeof user === 'object' && user !== null && ('name' in user || 'email' in user) ? ((user as any).name || (user as any).email) : 'E2E User'}</span>
             <button onClick={signOut} style={{padding: '5px 10px'}}>Sign Out</button>
         </div>
       </div>
