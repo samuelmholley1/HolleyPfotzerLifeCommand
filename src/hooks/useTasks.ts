@@ -6,14 +6,15 @@ import { Task } from '@/types/tasks';
 import { useState } from 'react';
 
 export function useTasks() {
-    const [tasks, setTasks] = useState([]);
+    // --- strongly-typed task list ---------------------------------
+    const [tasks, setTasks] = useState<Task[]>([]);
 
     const addTask = (task: Task) => {
         setTasks([...tasks, task]);
     };
 
-    const removeTask = (taskToRemove) => {
-        setTasks(tasks.filter(task => task !== taskToRemove));
+    const removeTask = (taskToRemove: Task) => {
+        setTasks(tasks.filter((t) => t.id !== taskToRemove.id));
     };
 
     return {
