@@ -1,5 +1,8 @@
 import { createClient } from '../lib/supabase/client';
 import { Task } from '../types/tasks';
+import { Database } from '../supabase';
+
+type TaskInsert = Database['public']['Tables']['tasks']['Insert'];
 
 // Define the shape of the data needed to create a task.
 // This makes our function calls type-safe and explicit.
