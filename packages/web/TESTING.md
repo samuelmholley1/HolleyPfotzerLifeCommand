@@ -28,3 +28,40 @@ All E2E tests use this pattern for mocking API responses.
 4. Write your test following the pattern in `auth.spec.ts`.
 
 All new tests should use the stateful client-side mock for consistency and reliability.
+
+## Database Migrations
+
+This project uses the [Supabase CLI](https://supabase.com/docs/guides/cli) for robust, version-controlled database schema management and migrations.
+
+### Migration Workflow
+
+- **Pull current schema from production:**
+  ```bash
+  yarn db:pull
+  ```
+  This command pulls the latest schema from the linked Supabase project and generates a migration if there are changes.
+
+- **Create a new migration:**
+  ```bash
+  yarn db:new-migration <migration_name>
+  ```
+  This creates a new migration file in `supabase/migrations/`.
+
+- **Apply migrations to local dev database:**
+  ```bash
+  yarn db:push
+  ```
+  This applies all pending migrations to your local database.
+
+- **Reset local database:**
+  ```bash
+  yarn db:reset-local
+  ```
+  This force-resets your local database and reapplies all migrations from scratch.
+
+### Best Practices
+- Always pull the latest schema before creating new migrations.
+- Review generated migration SQL before pushing to production.
+- Commit all migration files and the `supabase/config.toml` to version control.
+
+See the [Supabase CLI docs](https://supabase.com/docs/guides/cli) for advanced usage.

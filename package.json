@@ -15,11 +15,17 @@
     "ci": "yarn workspaces foreach --topological-dev run ci",
     "test": "yarn workspaces foreach run test",
     "e2e:start": "kill-port 3000 || true && yarn workspace web dev -- -p 3000",
-    "e2e:test": "yarn e2e:start & sleep 3 && yarn workspace web playwright test"
+    "e2e:test": "yarn e2e:start & sleep 3 && yarn workspace web playwright test",
+    "prepare": "husky install",
+    "db:pull": "supabase db pull",
+    "db:push": "supabase db push",
+    "db:new-migration": "supabase migration new",
+    "db:reset-local": "supabase db reset --force"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "husky": "^8.0.0"
   },
   "packageManager": "yarn@4.9.2"
 }
