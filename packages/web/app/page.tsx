@@ -13,6 +13,9 @@ export default function HomePage() {
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Helper to get the active workspace id from user or context
+  const activeWorkspaceId = (user as any)?.active_workspace_id || (user as any)?.workspace_id || '';
+
   useEffect(() => {
     const fetchTasks = async () => {
       setLoadingTasks(true);
@@ -35,6 +38,9 @@ export default function HomePage() {
     };
 
     fetchTasks();
+
+    // Expose fetchTasks as loadTasks for use in handleAddTask
+    (window as any).loadTasks = fetchTasks;
   }, []);
 
   const handleAddTask = async (title: string) => {
@@ -42,7 +48,7 @@ export default function HomePage() {
       setError('Cannot create task: Title is required.');
       return;
     }
-    if (!user?.workspace_id) {
+    if (!activeWorkspaceId) {
       setError('Cannot create task: No active workspace.');
       return;
     }
@@ -52,12 +58,14 @@ export default function HomePage() {
         project_id: null,
         due_date: null,
         priority: 1,
-        workspace_id: user.workspace_id,
+        workspace_id: activeWorkspaceId,
         user_id: user.id,
       });
-      setTasks(currentTasks => [...currentTasks, createdTask]);
-    } catch (error) {
-      setError('Failed to create task');
+      // Re-fetch the tasks from the mock API to update the list
+      await (window as any).loadTasks();
+    } catch (err) {
+      console.error("Failed to create task:", err);
+      setError("Could not create the task.");
     }
   };
 
@@ -86,7 +94,7 @@ export default function HomePage() {
           ) : error ? (
             <div>Error: {error}</div>
           ) : (
-            <TaskList tasks={tasks} onDeleteTask={handleDeleteTask} onUpdateTask={handleUpdateTask} />
+            <TaskList tasks={tasks} loading={loadingTasks} />
           )}
         </div>
       ) : (

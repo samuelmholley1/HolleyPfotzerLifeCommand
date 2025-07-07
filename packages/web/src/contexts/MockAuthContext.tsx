@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
 
-const MOCK_USER = { id: 'e2e-user', name: 'E2E User', workspace_id: 'e2e-ws' };
+const MOCK_USER = { id: 'e2e-user', name: 'E2E User', active_workspace_id: 'e2e-ws' };
 const MOCK_WORKSPACE = { id: 'e2e-ws', name: 'Default Workspace', ownerId: MOCK_USER.id };
 
 const MockAuthContext = createContext({

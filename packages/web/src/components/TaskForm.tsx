@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { useAuthContext } from '@/hooks/useAuthContext';
 
 interface TaskFormProps {
-  onCreate: (title: string) => void;
+  onAddTask: (title: string) => void;
 }
 
-export const TaskForm: React.FC<TaskFormProps> = ({ onCreate }) => {
+export const TaskForm: React.FC<TaskFormProps> = ({ onAddTask }) => {
   const [title, setTitle] = useState('');
   const { user, active_workspace_id } = useAuthContext();
   const isE2E = process.env.NEXT_PUBLIC_PW_E2E === '1';
@@ -14,7 +14,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ onCreate }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim()) {
-      onCreate(title.trim());
+      onAddTask(title.trim());
       setTitle('');
     }
   };
