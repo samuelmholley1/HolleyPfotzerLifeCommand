@@ -1,16 +1,21 @@
 import { test, expect } from '@playwright/test';
 
-test('User can create a task and see it in the list', async ({ page }) => {
-  await page.goto('/');
+test.describe('Create Task (E2E)', () => {
+  let mockTasks: any[] = [];
 
-  // Assert TaskForm is visible
-  await expect(page.getByTestId('task-input')).toBeVisible();
-  await expect(page.getByTestId('task-create-button')).toBeVisible();
+  test.beforeEach(async ({ page, request }) => {
+    // Clear server-side mockTasks
+    await request.delete('/api/tasks');
+  });
 
-  // Immediately fill and submit the new task
-  await page.getByTestId('task-input').fill('My New Verified Task');
-  await page.getByTestId('task-create-button').click();
+  test('User can create a task and see it in the list', async ({ page }) => {
+    await page.goto('/');
 
-  // Assert that the new task appears in the list
-  await expect(page.getByText('My New Verified Task')).toBeVisible();
+    await expect(page.getByTestId('task-input')).toBeVisible();
+
+    await page.getByTestId('task-input').fill('My New Verified Task');
+    await page.getByTestId('task-create-button').click();
+    // Assert that the new task appears in the list, waiting for the DOM to update.
+    await expect(page.getByText('My New Verified Task'), 'The new task should be visible after creation').toBeVisible();
+  });
 });

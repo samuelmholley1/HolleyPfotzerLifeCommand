@@ -64,8 +64,9 @@ export default function HomePage() {
       // Re-fetch the tasks from the mock API to update the list
       await (window as any).loadTasks();
     } catch (err) {
-      console.error("Failed to create task:", err);
-      setError("Could not create the task.");
+      // Log the specific error to diagnose the failure
+      const error = err as Error;
+      setError(`Error: Could not create the task. Reason: ${error.message}`);
     }
   };
 
