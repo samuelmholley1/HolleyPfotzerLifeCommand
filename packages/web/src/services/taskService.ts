@@ -8,6 +8,10 @@ async function handleResponse(response: Response) {
   return response.json();
 }
 
+/**
+ * This service handles all client-side interactions with the production API for tasks.
+ * It is used by React components and hooks to fetch, create, and update tasks via HTTP.
+ */
 export const taskService = {
   /**
    * Fetches all tasks for a given workspace.

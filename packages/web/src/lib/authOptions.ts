@@ -24,6 +24,10 @@ export const authOptions: NextAuthOptions = {
     strategy: 'database',
   },
   callbacks: {
+    /**
+     * Enriches the user session with data from the database (e.g., active_workspace_id).
+     * This ensures all API routes have access to the user's workspace context.
+     */
     async session({ session, user }) {
       // This callback is called whenever a session is checked.
       // We are adding the user's internal ID and active workspace from our database.
