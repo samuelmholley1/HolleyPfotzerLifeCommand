@@ -1,6 +1,7 @@
 // packages/web/src/app/api/e2e-mock/tasks/route.ts
 import { NextResponse } from 'next/server';
 
+// This interface must match the real Task type to prevent data contract errors.
 interface Task {
   id: string;
   title: string;
@@ -18,7 +19,7 @@ interface Task {
 
 // Use the global object to create a persistent in-memory "database"
 // that survives Next.js dev server hot-reloading. This is the key fix.
-const globalForDb = globalThis as unknown as { mockTasks: Task[] };
+const globalForDb = globalThis as unknown as { mockTasks: Task[] | undefined };
 if (!globalForDb.mockTasks) {
   globalForDb.mockTasks = [];
 }
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
     project_id: null,
     priority: 1,
   };
-  globalForDb.mockTasks.push(newTask);
+  globalForDb.mockTasks!.push(newTask);
   return NextResponse.json(newTask, { status: 201 });
 }
 
