@@ -2,24 +2,23 @@
  * FOR HUMANS: WHAT THIS FILE IS FOR
  *
  * This file defines the database and system structure. If you are not technical, you do not need to edit this file. For help, see the playbook or ask for a plain-language summary.
- */
-
-/**
- * PROJECT FOUNDATION SCHEMA & SYSTEM MAP: Life Command
  *
  * =====================
- * ONBOARDING ORDER FOR NEW AGENTS (MANDATORY READING)
+ * PROJECT FOUNDATION SCHEMA & SYSTEM MAP: Life Command
  * =====================
+ *
+ * ONBOARDING ORDER FOR NEW AGENTS (MANDATORY READING)
  *
  * 1. This file (`schema.ts`): Canonical schema, onboarding, and architecture notes.
  * 2. PROJECT_PLAYBOOK.md: Philosophy, SOP, next steps, onboarding protocol, and heuristics.
- * 3. A full database snapshot SQL (or its output, provided by the human if agent has no direct DB access): Actual DB implementation and schema drift detection.
+ * 3. packages/web/TESTING.md: E2E and unit testing, code quality, and database migration documentation (Supabase CLI workflow).
+ * 4. A full database snapshot SQL (or its output, provided by the human if agent has no direct DB access): Actual DB implementation and schema drift detection.
  *
  * Every agent turn MUST update the "NEXT STEPS & OPEN TASKS" section in the playbook, and move completed steps to the "COMPLETED STEPS LOG" for full project auditability.
  * If a file is not found during a search, agents MUST consult the schema mapping (or update it if missing) to locate the correct file. The goal is that agents always know exactly where to search for any schema-related file based on this mapping.
  * For the most accurate live schema, agents should request a full database snapshot SQL (see playbook for example query) from the human if direct DB access is not available.
  *
- * All three must be read in order before making any changes or taking action.
+ * All four must be read in order before making any changes or taking action.
  *
  * =====================
  * IMPORTANT: CONTEXT & NEXT STEPS
@@ -40,48 +39,50 @@
  * For all schema deletions, see: SCHEMA_DELETIONS_LOG.md
  *
  * =====================
- * PROJECT OVERVIEW & MODULE MAP
+ * PROJECT OVERVIEW & MODULE MAP (MONOREPO)
  * =====================
  *
- * - Database Schema: (this file) - All core tables, workspace/multi-tenant, cross-linking, analytics-ready.
- * - Contexts: `/contexts/` - React context providers for Auth, Workspace, Communication, etc.
- * - Services: `/services/` - Business logic for tasks, goals, projects, workspace, communication, analytics, etc.
- * - Components: `/components/` - All UI components (TaskList, Dashboard, DevLogin, ProfileMenu, etc.), web/native compatible.
- * - Hooks: `/hooks/` - Custom React hooks for data, workspace, communication state, etc.
- * - Types: `/types/` - TypeScript types for all major entities (Task, Goal, Project, Auth, etc.).
- * - Entry Points: `index.web.js`, `App.tsx` - Web/native app entry, root navigation, and context wiring.
- * - Config: `webpack.config.js`, `babel.config.js`, `tsconfig.json` - Build and transpile config for web/native.
- * - Supabase: `/supabase/` - SQL, RLS, and backend integration scripts.
+ * - Database Schema: lib/db/ - All core tables, workspace/multi-tenant, cross-linking, analytics-ready.
+ * - Web App: packages/web/ - Next.js application with all UI, services, and contexts.
+ * - Contexts: packages/web/src/contexts/ - React context providers for Auth, Workspace, Communication, etc.
+ * - Services: packages/web/src/services/ - Business logic for tasks, goals, projects, workspace, communication, analytics, etc.
+ * - Components: packages/web/src/components/ - All UI components (TaskList, Dashboard, etc.), web-optimized.
+ * - Hooks: packages/web/src/hooks/ - Custom React hooks for data, workspace, communication state, etc.
+ * - Types: packages/web/src/types/ - TypeScript types for all major entities (Task, Goal, Project, Auth, etc.).
+ * - E2E Tests: packages/web/e2e/ - Playwright E2E tests with client-side mocking.
+ * - Config: packages/web/next.config.js, packages/web/playwright.config.ts - Build and test config.
+ * - Supabase: supabase/ - SQL, RLS, and backend integration scripts.
  *
  * =====================
- * BUILD/RUN/TEST INSTRUCTIONS
+ * BUILD/RUN/TEST INSTRUCTIONS (MONOREPO)
  * =====================
  *
  * 1. Install dependencies (from project root):
- *    $ cd HolleyPfotzerLifeCommand
- *    $ npm install
+ *    $ yarn install
  *
- * 2. Run the web app (from HolleyPfotzerLifeCommand):
- *    $ npm run web
+ * 2. Run the web app:
+ *    $ yarn workspace web dev
  *    - Opens at http://localhost:3000
  *
- * 3. Run tests:
- *    $ npm test
+ * 3. Run unit tests:
+ *    $ yarn workspace web test
  *
- * 4. For native (if configured):
- *    $ npm run ios   # or npm run android
+ * 4. Run E2E tests:
+ *    $ yarn workspace web test:e2e
  *
  * 5. Build for production:
- *    $ npm run build:web
+ *    $ yarn workspace web build
  *
  * =====================
  * ONBOARDING & HANDOFF NOTES
  * =====================
  *
  * - All major flows (auth, tasks, goals, projects, communication, clarifications) are modular and extensible.
- * - AuthContext is the canonical source for authentication state and actions (see /contexts/AuthContext.tsx).
- * - Service layer is the only place for business logic (see /services/).
+ * - AuthContext is the canonical source for authentication state and actions (see packages/web/src/contexts/AuthContext.tsx).
+ * - MockAuthContext provides E2E testing authentication (see packages/web/src/contexts/MockAuthContext.tsx).
+ * - Service layer is the only place for business logic (see packages/web/src/services/).
  * - UI is web/native compatible; use React Native Web for browser.
+ * - E2E testing uses Playwright with client-side mocking via page.route() (see packages/web/TESTING.md).
  * - All new features should be added as new modules/services/components, not by modifying the schema directly unless DB changes are needed.
  * - For security, see SECURITY_IMPLEMENTATION_GUIDE.md and RED_TEAM_CRITICAL_SECURITY_AUDIT.md.
  * - For DB/RLS, see /supabase/ and DATABASE_SETUP_INSTRUCTIONS.md.
@@ -349,11 +350,13 @@ export const schema = appSchema({
  * =====================
  *
  * All actual UI/admin/debugging files are located in:
- *   - HolleyPfotzerLifeCommand/components/ (UI components)
- *   - HolleyPfotzerLifeCommand/services/ (business logic)
- *   - HolleyPfotzerLifeCommand/types/ (TypeScript types)
- *   - HolleyPfotzerLifeCommand/lib/db/ (utilities, schema, slug utils)
- *   - .env, .env.*, and .gitignore files in HolleyPfotzerLifeCommand/ (canonical root, not tracked by git, must be provided by user if needed)
+ *   - packages/web/src/components/ (UI components for web)
+ *   - packages/web/src/services/ (business logic for web)
+ *   - packages/web/src/types/ (TypeScript types for web)
+ *   - packages/web/src/contexts/ (React context providers)
+ *   - lib/db/ (shared utilities, schema, slug utils)
+ *   - packages/web/.env*, packages/web/next.config.js (web-specific config)
+ *   - .env, .env.*, and .gitignore files in project root (monorepo-level config)
  *
  * The following file/path patterns DO NOT exist and should be avoided in searches and code:
  *   - Any file or folder named 'admin' or 'debug'.
@@ -404,14 +407,16 @@ export const schema = appSchema({
 
 /*
  * =====================
- * ENVIRONMENT FILES & GITIGNORE PROTOCOL
+ * ENVIRONMENT FILES & GITIGNORE PROTOCOL (MONOREPO)
  * =====================
  *
- * - The app requires a `.env` file with Supabase and other secrets. This file must exist in HolleyPfotzerLifeCommand/ (the canonical project root). If running the web app from a different folder, ensure `.env` is present there as well.
- * - `.env` and related files are always listed in `HolleyPfotzerLifeCommand/.gitignore` (or `.gitignore bak` if temporarily renamed for local-only work). Never commit `.env` or secrets to git or GitHub.
- * - If you see `.gitignore bak`, you MUST rename it back to `.gitignore` before any commit, push, or linking to GitHub. This prevents accidental exposure of secrets.
- * - To search for `.env` or `.gitignore` files, look in HolleyPfotzerLifeCommand/ (the canonical root).
- * - For onboarding, see PROJECT_PLAYBOOK.md for step-by-step instructions on environment setup and secure file handling.
+ * - The web app requires environment files in packages/web/ (.env.local, .env.test for E2E).
+ * - E2E tests use .env.test with NEXT_PUBLIC_PW_E2E=1 and NEXT_PUBLIC_USE_MOCK_AUTH=true.
+ * - Next.js config (packages/web/next.config.js) propagates E2E environment variables.
+ * - Root-level .env files are for monorepo-wide config and shared secrets.
+ * - Environment files are always listed in .gitignore. Never commit secrets to git.
+ * - MockAuthContext is enabled via NEXT_PUBLIC_USE_MOCK_AUTH=true in E2E mode.
+ * - For onboarding, see PROJECT_PLAYBOOK.md and packages/web/TESTING.md for setup instructions.
  */
 
 /*

@@ -1,5 +1,24 @@
 # Testing Documentation
 
+---
+
+## SESSION SUMMARY (2025-07-06)
+
+**Major Infrastructure Upgrades:**
+- Implemented Supabase CLI for robust, version-controlled database schema management and migrations.
+- Added database management scripts to the root `package.json` for migrations and local resets.
+- Pulled the current schema from the live Supabase project and generated the initial migration.
+- Consolidated all E2E and unit testing documentation, code quality automation, and migration instructions into this file (`TESTING.md`).
+- Removed the now-redundant `E2E_TESTING_GUIDE.md` and updated all references across foundational docs.
+
+**Documentation and Onboarding:**
+- All onboarding orders, file mappings, and SOPs in `schema.ts` and `PROJECT_PLAYBOOK.md` now reference this file as the canonical source for E2E/unit testing and migration documentation.
+- All links and references to E2E/testing/migration docs are up to date and correct.
+
+**Best Practices:**
+- Always use the documented Supabase CLI workflow for schema changes and migrations.
+- Refer to this file for all testing, code quality, and database management protocols.
+
 ## Quick Start
 
 To run the end-to-end (E2E) test suite:

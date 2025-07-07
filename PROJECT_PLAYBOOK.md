@@ -1,6 +1,6 @@
 # PROJECT PLAYBOOK: Holley-Pfotzer Life Command App
 
-## Version: 2.1
+## Version: 2.2
 
 ---
 
@@ -17,6 +17,7 @@ This playbook is your guide to the project. If you are not technical, just read 
 1. Read the three mandatory onboarding docs in order:
    - `lib/db/schema.ts` (schema, mapping, onboarding)
    - `PROJECT_PLAYBOOK.md` (SOP, philosophy, logging, next steps)
+   - `packages/web/TESTING.md` (E2E and unit testing, code quality, and database migration documentation (Supabase CLI workflow))
    - The latest database snapshot files (DDL, columns, relationships)
 2. Confirm file mapping and onboarding order match across all docs.
 3. Before making changes, check the "NEXT STEPS & OPEN TASKS" and log all actions/decisions.
@@ -43,9 +44,10 @@ This playbook is your guide to the project. If you are not technical, just read 
 
 **Before making any changes, all new agents (AI or human) must read these files in order:**
 
-1. `HolleyPfotzerLifeCommand/lib/db/schema.ts` — Canonical schema, onboarding, and architecture notes.
-2. `HolleyPfotzerLifeCommand/PROJECT_PLAYBOOK.md` — Philosophy, SOP, next steps, onboarding protocol, and heuristics.
-3. A full database snapshot SQL (or its output, provided by the human if agent has no direct DB access) — Actual DB implementation and schema drift detection.
+1. `lib/db/schema.ts` — Canonical schema, onboarding, and architecture notes.
+2. `PROJECT_PLAYBOOK.md` — Philosophy, SOP, next steps, onboarding protocol, and heuristics.
+3. `packages/web/TESTING.md` — E2E and unit testing, code quality, and database migration documentation (Supabase CLI workflow).
+4. A full database snapshot SQL (or its output, provided by the human if agent has no direct DB access) — Actual DB implementation and schema drift detection.
 
 **Rules:**
 - Every agent turn MUST update the "NEXT STEPS & OPEN TASKS" section and move completed steps to the "COMPLETED STEPS LOG".
@@ -244,6 +246,8 @@ This project is governed by four core, sometimes competing, goals:
 - ✅ Signal Protocol cryptography implementation (2025-01-05)
 - ✅ Comprehensive type system in /types/ directory (2025-01-05)
 - ✅ Repository publishing and branch management (2025-01-05)
+- ✅ Supabase CLI and migration system established, initial schema migration pulled and version-controlled, and database management scripts added to package.json (2025-07-06)
+- ✅ E2E and unit testing documentation consolidated in packages/web/TESTING.md (2025-07-06)
 
 ---
 
@@ -364,6 +368,8 @@ All actual UI/admin/debugging files are located in:
 - `HolleyPfotzerLifeCommand/services/` (business logic)
 - `HolleyPfotzerLifeCommand/types/` (TypeScript types)
 - `HolleyPfotzerLifeCommand/lib/db/` (utilities, schema, slug utils)
+- `HolleyPfotzerLifeCommand_Monorepo/packages/web/TESTING.md` (canonical E2E/unit testing and database migration documentation)
+- `HolleyPfotzerLifeCommand_Monorepo/supabase/` (Supabase CLI migrations, config, and SQL)
 - `.env`, `.env.*`, and `.gitignore` files in `HolleyPfotzerLifeCommand/` (canonical root, not tracked by git, must be provided by user if needed)
 
 The following file/path patterns DO NOT exist and should be avoided in searches and code:
@@ -775,13 +781,15 @@ INSERT INTO tasks (
 
 ---
 
-## COMPLETED STEPS LOG
+## SESSION SUMMARY (2025-07-06)
 
-- 2025-01-05: Build stabilization and TypeScript error resolution
-- 2025-01-05: Platform code splitting (.native.ts/.web.ts)
-- 2025-01-05: Signal Protocol cryptography implementation
-- 2025-01-05: Comprehensive type system in /types/ directory
-- 2025-01-05: Repository publishing and branch management
-- 2025-07-04: Task model updated to include slug field (lib/db/Task.ts).
-- 2025-07-04: TaskCard updated to display slug for admin/debugging (components/tasks/TaskCard.tsx).
-- 2025-07-06: Playwright E2E Test Suite & Ergonomic Scripts setup
+- Supabase CLI and migration system established; initial schema migration pulled and version-controlled.
+- Database management scripts added to root `package.json` for migrations and local resets.
+- All E2E and unit testing documentation, code quality automation, and migration instructions consolidated in `packages/web/TESTING.md`.
+- Removed redundant `E2E_TESTING_GUIDE.md` and updated all references in foundational docs.
+- All onboarding, mapping, and SOP docs reference the correct, current files.
+- All completed steps and major changes are logged in this playbook.
+- All links and file references are correct and up to date.
+- No redundant or outdated documentation remains.
+
+---
