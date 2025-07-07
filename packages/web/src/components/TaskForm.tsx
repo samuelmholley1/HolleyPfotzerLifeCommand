@@ -26,8 +26,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({ onCreate }) => {
         onChange={e => setTitle(e.target.value)}
         placeholder="Task title"
         className="w-full p-2 border rounded"
+        data-testid="task-input"
       />
-      <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded" disabled={!title.trim() || !user || !active_workspace_id}>
+      <button
+        type="submit"
+        className="px-4 py-2 bg-blue-500 text-white rounded"
+        disabled={!title.trim() || !user || !active_workspace_id}
+        data-testid="task-create-button"
+      >
         Create Task
       </button>
     </form>
