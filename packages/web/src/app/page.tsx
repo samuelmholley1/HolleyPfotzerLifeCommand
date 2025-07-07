@@ -24,29 +24,6 @@ function HomePageContent() {
 
   const activeWorkspaceId = user?.active_workspace_id;
 
-  // E2E: Always render TaskForm and seed Alice's Task
-  useEffect(() => {
-    if (isE2E) {
-      setTasks([
-        {
-          id: '1',
-          title: "Alice's Task",
-          completed_at: null,
-          created_at: new Date().toISOString(),
-          description: "Seeded E2E task for Alice.",
-          due_date: null,
-          priority: 1,
-          project_id: null,
-          status: 'pending',
-          updated_at: new Date().toISOString(),
-          user_id: 'e2e-user',
-          workspace_id: 'e2e-workspace',
-        },
-      ]);
-      setLoadingTasks(false);
-    }
-  }, []);
-
   const loadTasks = useCallback(async () => {
     if (!activeWorkspaceId) {
       setTasks([]);
@@ -56,6 +33,7 @@ function HomePageContent() {
     setError(null);
     try {
       const fetchedTasks = await taskService.getTasks(activeWorkspaceId);
+      console.log('🎯 [E2E UI] loadTasks →', fetchedTasks);
       setTasks(fetchedTasks);
     } catch (err) {
       console.error("Failed to fetch tasks:", err);
@@ -65,9 +43,10 @@ function HomePageContent() {
     }
   }, [activeWorkspaceId]);
 
+  // Always load tasks on mount
   useEffect(() => {
-    if (!isE2E) loadTasks();
-  }, [loadTasks]);
+    loadTasks();
+  }, []);
 
   const handleCreateTask = async (title: string) => {
     if (!activeWorkspaceId && !isE2E) {
@@ -80,10 +59,12 @@ function HomePageContent() {
         workspace_id: activeWorkspaceId || 'e2e-workspace',
         user_id: (user && user.id) || 'e2e-user',
       });
-      if (!isE2E) await loadTasks();
+      console.log('🚀 Task creation successful, reloading tasks...');
+      await loadTasks(); // Always reload tasks after creation, even in E2E
     } catch (err) {
-      console.error("Failed to create task:", err);
-      setError("Could not create the task.");
+      const error = err as Error;
+      console.error("❌ Failed to create task:", error.message);
+      setError(`Could not create the task: ${error.message}`);
     }
   };
 
