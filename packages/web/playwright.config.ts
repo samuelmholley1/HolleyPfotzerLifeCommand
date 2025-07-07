@@ -16,5 +16,6 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: false,
     timeout: 120_000,
+    env: { NODE_ENV: 'test' },
   },
 });
