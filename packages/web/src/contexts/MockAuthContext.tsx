@@ -2,12 +2,15 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
 
-const MOCK_USER = { id: 'e2e-user', name: 'E2E User' };
-const MOCK_WS = 'e2e-ws';
+const MOCK_USER = {
+  id: 'e2e-user',
+  name: 'E2E User',
+  active_workspace_id: 'e2e-ws',
+};
 
 const MockAuthContext = createContext({
   user: MOCK_USER,
-  activeWorkspaceId: MOCK_WS,
+  active_workspace_id: MOCK_USER.active_workspace_id,
   loading: false,
   signInWithGoogle: async () => {},
   signOut: async () => {},
@@ -19,7 +22,7 @@ export const MockAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
       <MockAuthContext.Provider
         value={{
           user: MOCK_USER,
-          activeWorkspaceId: MOCK_WS,
+          active_workspace_id: MOCK_USER.active_workspace_id,
           loading: false,
           signInWithGoogle: async () => {},
           signOut: async () => {},
@@ -31,7 +34,7 @@ export const MockAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
   }
   // fallback for non-E2E
   return (
-    <MockAuthContext.Provider value={{ user: undefined, activeWorkspaceId: undefined, loading: false, signInWithGoogle: async () => {}, signOut: async () => {} }}>
+    <MockAuthContext.Provider value={{ user: MOCK_USER, active_workspace_id: MOCK_USER.active_workspace_id, loading: false, signInWithGoogle: async () => {}, signOut: async () => {} }}>
       {children}
     </MockAuthContext.Provider>
   );

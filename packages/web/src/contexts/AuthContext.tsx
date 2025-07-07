@@ -1,17 +1,10 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
-import { Session, User } from '@supabase/supabase-js';
+import { AuthUser } from '../types/auth';
 import { createClient } from '../lib/supabase/client';
+import { User } from '@supabase/supabase-js';
 
 // 1. DEFINE THE AUTHORITATIVE USER AND AUTH STATE TYPES
-export interface AuthUser {
-  id: string;
-  email: string | null;
-  name: string | null;
-  avatar_url: string | null;
-  active_workspace_id: string | null;
-}
-
 export interface AuthState {
   user: AuthUser | null;
   loading: boolean;
@@ -19,7 +12,10 @@ export interface AuthState {
 }
 
 // 2. DEFINE THE CONTEXT TYPE
-interface AuthContextType extends AuthState {
+interface AuthContextType {
+  user: AuthUser | null;
+  loading: boolean;
+  active_workspace_id: string | null | undefined;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -57,16 +53,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     error: null,
   });
 
-  const formatUser = useCallback((user: User | null): AuthUser | null => {
-    if (!user) return null;
-    return {
-      id: user.id,
-      email: user.email ?? null,
-      name: user.user_metadata?.full_name ?? user.user_metadata?.name ?? null,
-      avatar_url: user.user_metadata?.avatar_url ?? user.user_metadata?.picture ?? null,
-      active_workspace_id: null, // We will fetch this next
-    };
-  }, []);
+  // Helper to format the Supabase user into our app's user type
+  const formatUser = (user: User): AuthUser => ({
+    ...user,
+    email: user.email ?? undefined,
+    name: user.user_metadata?.name ?? user.email ?? undefined,
+    active_workspace_id: user.user_metadata?.active_workspace_id ?? null,
+  });
   
   const getSession = useCallback(async () => {
     try {
@@ -124,8 +117,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setAuthState({ user: null, loading: false, error: null });
   };
 
-  const value = { ...authState, signInWithGoogle, signOut };
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  const { user, loading } = authState;
+  return (
+    <AuthContext.Provider
+      value={{
+        user: authState.user,
+        loading: authState.loading,
+        active_workspace_id: authState.user?.active_workspace_id,
+        signInWithGoogle,
+        signOut,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 // 4. CREATE THE USEAUTH HOOK
