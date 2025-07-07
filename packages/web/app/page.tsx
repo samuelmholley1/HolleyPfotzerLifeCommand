@@ -49,7 +49,7 @@ export default function HomePage() {
       return;
     }
     try {
-      const createdTask = await taskService.createTask({ title });
+      const createdTask = await taskService.createTask({ title, workspace_id: activeWorkspaceId });
       // Re-fetch the tasks from the mock API to update the list
       await (window as any).loadTasks();
     } catch (err) {

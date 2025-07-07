@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { mockTaskApi } from '../mocks/task-api-mock';
+import { mockTaskApi } from './mocks/task-api-mock';
 
 test.describe('Authentication Flow (E2E always-authenticated)', () => {
   test.beforeEach(async ({ page }) => {

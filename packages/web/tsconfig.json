@@ -39,6 +39,8 @@
   },
   "include": [
     "src",
+    "app",
+    "e2e",
     ".next/types/**/*.ts"
   ],
   "exclude": [

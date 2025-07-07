@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { mockTaskApi } from '../mocks/task-api-mock';
+import { mockTaskApi } from './mocks/task-api-mock';
 
 test.describe('Create Task (E2E)', () => {
   test.beforeEach(async ({ page }) => {

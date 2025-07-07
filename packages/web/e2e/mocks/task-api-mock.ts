@@ -1,4 +1,5 @@
 // packages/web/e2e/mocks/task-api-mock.ts
+export {};
 import { Page } from '@playwright/test';
 
 export async function mockTaskApi(page: Page) {
