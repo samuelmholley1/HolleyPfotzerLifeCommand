@@ -3,7 +3,7 @@
 import { TaskForm } from '@/components/TaskForm';
 import { TaskList } from '@/components/TaskList';
 import { useAuthContext } from '@/hooks/useAuthContext';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { taskService } from '@/services/taskService';
 import { Task } from '@/types/tasks';
 
@@ -37,8 +37,28 @@ export default function HomePage() {
     fetchTasks();
   }, []);
 
-  const handleAddTask = async (task: Task) => {
-    // Add task implementation
+  const handleAddTask = async (title: string) => {
+    if (!title.trim()) {
+      setError('Cannot create task: Title is required.');
+      return;
+    }
+    if (!user?.workspace_id) {
+      setError('Cannot create task: No active workspace.');
+      return;
+    }
+    try {
+      const createdTask = await taskService.createTask({
+        title,
+        project_id: null,
+        due_date: null,
+        priority: 1,
+        workspace_id: user.workspace_id,
+        user_id: user.id,
+      });
+      setTasks(currentTasks => [...currentTasks, createdTask]);
+    } catch (error) {
+      setError('Failed to create task');
+    }
   };
 
   const handleDeleteTask = async (taskId: string) => {

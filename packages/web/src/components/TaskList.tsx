@@ -4,7 +4,7 @@ import { Task } from '../types/tasks';
 
 interface TaskListProps {
   tasks: Task[];
-  loading: boolean;
+  loading?: boolean;
 }
 
 export const TaskList: React.FC<TaskListProps> = ({ tasks, loading }) => {
