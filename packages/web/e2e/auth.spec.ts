@@ -1,11 +1,33 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Authentication Flow (E2E always-authenticated)', () => {
-  let mockTasks: any[] = [];
+  test.beforeEach(async ({ page }) => {
+    // This client-side mock will intercept all calls to the tasks API.
+    // It is stateful and will persist for the duration of a single test.
+    let mockTasks: any[] = [];
 
-  test.beforeEach(async ({ page, request }) => {
-    // Clear server-side mockTasks
-    await request.delete('/api/e2e-mock/tasks');
+    await page.route('**/api/tasks', async route => {
+      const request = route.request();
+
+      if (request.method() === 'DELETE') {
+        mockTasks = [];
+        return route.fulfill({ status: 200, body: JSON.stringify({ ok: true }) });
+      }
+
+      if (request.method() === 'GET') {
+        return route.fulfill({ status: 200, body: JSON.stringify(mockTasks) });
+      }
+
+      if (request.method() === 'POST') {
+        const task = await request.postDataJSON();
+        const newTask = { id: `mock-id-${Date.now()}`, ...task };
+        mockTasks.push(newTask);
+        return route.fulfill({ status: 201, body: JSON.stringify(newTask) });
+      }
+    });
+
+    // Reset the mock state before each test run.
+    await page.request.delete('/api/tasks');
   });
 
   test('should show TaskForm and allow task creation', async ({ page }) => {

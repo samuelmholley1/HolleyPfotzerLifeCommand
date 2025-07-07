@@ -12,10 +12,11 @@ export interface AuthState {
 }
 
 // 2. DEFINE THE CONTEXT TYPE
-interface AuthContextType {
-  user: AuthUser | null;
+export interface AuthContextType {
+  user: { id: string; name: string } | null;
   loading: boolean;
-  active_workspace_id: string | null | undefined;
+  activeWorkspaceId?: string;
+  workspaces: { id: string; name: string; ownerId: string }[];
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -27,19 +28,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // E2E stub: if running in test/E2E mode, always provide a fake user
   if (typeof process !== 'undefined' && (process.env.NEXT_PUBLIC_PW_E2E === '1' || process.env.NODE_ENV === 'test' || process.env.E2E === 'true')) {
     if (process.env.NEXT_PUBLIC_PW_E2E === '1') {
-      return <div data-testid="stub-authenticated">E2E User</div>;
+      // In E2E mode, use our full mock context so form/list behave normally
+      const { MockAuthProvider } = require('./MockAuthContext');
+      return <MockAuthProvider>{children}</MockAuthProvider>;
     }
     const fakeUser = {
       id: 'e2e-user',
-      email: 'e2e@example.com',
       name: 'E2E User',
-      avatar_url: null,
-      active_workspace_id: 'e2e-workspace',
+    };
+    const fakeWorkspace = {
+      id: 'e2e-workspace',
+      name: 'Default Workspace',
+      ownerId: 'e2e-user',
     };
     const value = {
       user: fakeUser,
       loading: false,
-      error: null,
+      activeWorkspaceId: fakeWorkspace.id,
+      workspaces: [fakeWorkspace],
       signInWithGoogle: async () => {},
       signOut: async () => {},
     };
@@ -68,7 +74,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (error) throw error;
       
-      const user = formatUser(session?.user ?? null);
+      const user = session?.user ? formatUser(session.user) : null;
       let finalUser = user;
 
       // If a user exists, fetch their active workspace from the profiles table
@@ -121,9 +127,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   return (
     <AuthContext.Provider
       value={{
-        user: authState.user,
+        user: authState.user
+          ? { id: authState.user.id, name: authState.user.name ?? '' }
+          : null,
         loading: authState.loading,
-        active_workspace_id: authState.user?.active_workspace_id,
+        activeWorkspaceId: authState.user?.active_workspace_id ?? undefined,
+        workspaces: authState.user && (authState.user as any).workspaces ? (authState.user as any).workspaces : [],
         signInWithGoogle,
         signOut,
       }}
