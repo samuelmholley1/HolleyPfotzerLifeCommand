@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "playwright test",
-    "test:e2e:dev": "yarn dev -- -p 3000",
+    "test:e2e:dev": "next dev -p 3000",
     "ci": "yarn build && yarn lint && yarn test",
     "e2e": "playwright test",
     "e2e:3001": "cross-env PLAYWRIGHT_BASE_URL=http://localhost:3001 playwright test"
