@@ -10,7 +10,9 @@
     "dev:native": "yarn workspace native expo start",
     "lint": "yarn workspaces foreach run lint",
     "ci": "yarn workspaces foreach --topological-dev run ci",
-    "test": "yarn workspaces foreach run test"
+    "test": "yarn workspaces foreach run test",
+    "e2e:start": "kill-port 3000 || true && yarn workspace web dev -- -p 3000",
+    "e2e:test": "yarn e2e:start & sleep 3 && yarn workspace web playwright test"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
