@@ -5,7 +5,7 @@ test.describe('Create Task (E2E)', () => {
 
   test.beforeEach(async ({ page, request }) => {
     // Clear server-side mockTasks
-    await request.delete('/api/tasks');
+    await request.delete('/api/e2e-mock/tasks');
   });
 
   test('User can create a task and see it in the list', async ({ page }) => {

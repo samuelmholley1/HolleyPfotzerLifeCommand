@@ -5,7 +5,7 @@ test.describe('Authentication Flow (E2E always-authenticated)', () => {
 
   test.beforeEach(async ({ page, request }) => {
     // Clear server-side mockTasks
-    await request.delete('/api/tasks');
+    await request.delete('/api/e2e-mock/tasks');
   });
 
   test('should show TaskForm and allow task creation', async ({ page }) => {
