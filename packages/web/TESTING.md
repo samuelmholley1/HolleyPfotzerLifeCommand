@@ -90,3 +90,32 @@ This project uses the [Supabase CLI](https://supabase.com/docs/guides/cli) for r
 - Commit all migration files and the `supabase/config.toml` to version control.
 
 See the [Supabase CLI docs](https://supabase.com/docs/guides/cli) for advanced usage.
+
+# RED TEAM REPORT: July 6/7, 2025
+
+## Summary
+
+This session focused on eliminating all E2E test infrastructure issues, normalizing test and mock function naming, and ensuring all foundational documentation and onboarding protocols are up to date and fully linked. All changes are now committed and pushed to GitHub.
+
+## Key Actions
+- Resolved Playwright/TypeScript module resolution conflicts by removing duplicate/empty mock files and correcting import paths.
+- Normalized all E2E mock function names to `mockTaskApi` for clarity and consistency.
+- Fixed a critical TypeScript error in `app/page.tsx` (missing `workspace_id` in task creation).
+- Updated `tsconfig.json` to include the `e2e` directory for type checking.
+- Verified and updated all foundational documentation links in `PROJECT_PLAYBOOK.md` and `lib/db/schema.ts` to reference `packages/web/TESTING.md` as the canonical E2E/testing/migration doc.
+- Confirmed all onboarding orders, file mappings, and SOPs are correct and up to date.
+- All changes are committed and pushed to GitHub.
+
+## Security/Process Notes
+- All E2E tests now use Playwright with client-side mocking only (no server-side test hooks).
+- All onboarding and handoff protocols are current and referenced in both `PROJECT_PLAYBOOK.md` and `schema.ts`.
+- No uncommitted changes remain; repository is fully synchronized.
+
+## Next Steps
+- Continue to use `packages/web/TESTING.md` as the single source of truth for all E2E/unit testing and migration documentation.
+- All new agents must follow the onboarding order: `schema.ts` → `PROJECT_PLAYBOOK.md` → `TESTING.md` → DB snapshot.
+- For any future E2E or test infrastructure changes, update all three foundational docs and commit immediately.
+
+---
+
+**Session complete. All E2E and foundational documentation is now robust, up to date, and fully linked.**
