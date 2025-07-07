@@ -11,7 +11,7 @@ export default defineConfig({
     navigationTimeout: 30000,
   },
   webServer: {
-    command: 'yarn test:e2e:dev',
+    command: 'yarn dev',
     cwd: __dirname,
     url: 'http://localhost:3000',
     reuseExistingServer: false,
