@@ -11,7 +11,11 @@
     "ci": "yarn build && yarn lint && yarn test",
     "e2e": "playwright test",
     "e2e:3001": "cross-env PLAYWRIGHT_BASE_URL=http://localhost:3001 playwright test",
-    "test:unit": "jest"
+    "test:unit": "jest",
+    "lint:check": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write ."
   },
   "dependencies": {
     "@next-auth/supabase-adapter": "^0.2.1",
@@ -42,10 +46,14 @@
     "cross-env": "^7.0.3",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
+    "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-jest": "27.6.0",
+    "husky": "^9.1.7",
     "jest": "^30.0.4",
     "jest-environment-jsdom": "^30.0.4",
+    "lint-staged": "^16.1.2",
     "playwright": "^1.43.1",
+    "prettier": "^3.6.2",
     "ts-jest": "29.1.1",
     "typescript": "^5.8.3",
     "wait-on": "^8.0.3"

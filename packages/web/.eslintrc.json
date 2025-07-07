@@ -1,5 +1,5 @@
 {
-  "extends": ["next/core-web-vitals", "plugin:jest/recommended"],
+  "extends": ["next/core-web-vitals", "plugin:jest/recommended", "prettier"],
   "plugins": ["jest"],
   "parser": "@babel/eslint-parser",
   "parserOptions": {
