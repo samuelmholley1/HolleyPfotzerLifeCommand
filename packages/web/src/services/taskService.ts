@@ -3,7 +3,7 @@ import { Task } from '@/types/tasks';
 async function handleResponse(response: Response) {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'API request failed');
+    throw new Error(errorData.message || 'API error');
   }
   return response.json();
 }

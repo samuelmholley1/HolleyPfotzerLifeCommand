@@ -37,7 +37,13 @@ The E2E testing infrastructure uses Playwright with a fully client-side mocking 
 - Deterministic, fast, and reliable tests
 - No dependency on server-side test hooks or network conditions
 
-All E2E tests use this pattern for mocking API responses.
+**All E2E tests now use client-side API mocking. Server-side mocks and `/api/e2e-mock` routes are deprecated and have been removed.**
+
+### Criticisms / Improvements
+- **Test Coverage:** Ensure your mocks handle all HTTP verbs (GET, POST, DELETE, PUT) that your UI might use, or tests may fail unexpectedly.
+- **Reset State:** If you want each test to start with a clean slate, consider resetting mock state at the start of each test (see `mockTaskApi`).
+- **Type Safety:** For production, consider typing mocks with your real `Task` type for better safety and maintainability.
+- **Documentation:** This file is the canonical source for E2E mocking and testing protocols.
 
 ## How to Add a New Test
 

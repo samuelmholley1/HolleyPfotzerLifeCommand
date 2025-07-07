@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { TaskForm } from '@/components/TaskForm';
 import { TaskList } from '@/components/TaskList';
@@ -22,16 +22,12 @@ export default function HomePage() {
       setError(null);
 
       try {
-        // Fetch tasks from your API or database
-        const response = await fetch('/api/tasks');
-        if (!response.ok) {
-          throw new Error('Failed to fetch tasks');
-        }
-
-        const data = await response.json();
+        // Use the taskService to fetch tasks (respects E2E mode)
+        const data = await taskService.getTasks('');
+        console.log('✅ [loadTasks] Fetched tasks from API:', data);
         setTasks(data);
       } catch (error) {
-        setError(error.message);
+        setError(error instanceof Error ? error.message : String(error));
       } finally {
         setLoadingTasks(false);
       }
@@ -53,14 +49,7 @@ export default function HomePage() {
       return;
     }
     try {
-      const createdTask = await taskService.createTask({
-        title,
-        project_id: null,
-        due_date: null,
-        priority: 1,
-        workspace_id: activeWorkspaceId,
-        user_id: user.id,
-      });
+      const createdTask = await taskService.createTask({ title });
       // Re-fetch the tasks from the mock API to update the list
       await (window as any).loadTasks();
     } catch (err) {
@@ -89,7 +78,12 @@ export default function HomePage() {
         <div>
           <p>Hello, {user.name}!</p>
           <button onClick={signOut}>Sign Out</button>
-          <TaskForm onAddTask={handleAddTask} />
+          <TaskForm onCreate={handleAddTask} />
+          {/* eslint-disable-next-line no-console */}
+          {(() => {
+            console.log('➡️ [Render] Passing tasks to TaskList:', tasks);
+            return null;
+          })()}
           {loadingTasks ? (
             <div>Loading tasks...</div>
           ) : error ? (

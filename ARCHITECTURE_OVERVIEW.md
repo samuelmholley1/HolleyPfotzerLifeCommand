@@ -1,5 +1,18 @@
 # Architecture Overview & File Mapping
 
+**⚠️ MONOREPO VERSION:** This is the official monorepo documentation. All web code is in `packages/web/`, and this is the single source of truth as of July 2025. See [PROJECT_PLAYBOOK.md](PROJECT_PLAYBOOK.md) for the canonical doc index and onboarding order.
+
+## Foundational Docs (Cross-links)
+- [Project Playbook (Hub)](PROJECT_PLAYBOOK.md)
+- [Red Team Review Findings](RED_TEAM_REVIEW_FINDINGS_2025-07-06.md)
+- [Onboarding Guide](ONBOARDING_GUIDE.md)
+- [Migration Protocols](MIGRATION_PROTOCOLS.md)
+- [Security Guide](SECURITY_GUIDE.md)
+- [Open Tasks](OPEN_TASKS.md)
+- [Completed Steps Log](COMPLETED_STEPS_LOG.md)
+- [Manual vs. Automatic WatermelonDB Migration](WATERMELONDB_MIGRATION_MANUAL_VS_AUTOMATIC.md)
+- [Testing Guide](packages/web/TESTING.md)
+
 ## Monorepo Structure
 
 This project follows a Yarn Berry monorepo structure optimized for web and future native development.

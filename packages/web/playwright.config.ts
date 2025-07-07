@@ -6,7 +6,6 @@ export default defineConfig({
   reporter: 'html',
   use: {
     baseURL,
-    storageState: './e2e/auth-storage.json',
     actionTimeout: 10000,
     navigationTimeout: 30000,
   },

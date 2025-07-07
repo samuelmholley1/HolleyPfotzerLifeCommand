@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { mockTaskApi } from './mocks/task-api-mock';
+import { mockTaskApi } from '../mocks/task-api-mock';
 
 test.describe('Create Task (E2E)', () => {
   test.beforeEach(async ({ page }) => {
@@ -14,6 +14,9 @@ test.describe('Create Task (E2E)', () => {
     await page.getByTestId('task-input').fill('My New Verified Task');
     await page.getByTestId('task-create-button').click();
     // Assert that the new task appears in the list, waiting for the DOM to update.
-    await expect(page.getByText('My New Verified Task'), 'The new task should be visible after creation').toBeVisible();
+    await expect(
+      page.getByText('My New Verified Task'),
+      'The new task should be visible after creation',
+    ).toBeVisible();
   });
 });

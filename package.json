@@ -23,9 +23,13 @@
     "db:reset-local": "supabase db reset --force"
   },
   "devDependencies": {
+    "@babel/preset-react": "^7.27.1",
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "husky": "^8.0.0"
+    "husky": "^8.0.0",
+    "typescript": "^5.0.0"
   },
-  "packageManager": "yarn@4.9.2"
+  "packageManager": "yarn@4.9.2",
+  "dependencies": {
+    "next": "^15.3.5"
+  }
 }

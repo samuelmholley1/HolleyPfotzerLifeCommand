@@ -4,53 +4,39 @@ import { authOptions } from '@/lib/authOptions';
 import { dbTaskService } from '@/services/dbTaskService';
 import { AuthUser } from '@/types/auth';
 
-function sessionUserToAuthUser(user: any): AuthUser {
-  return {
-    id: user.id,
-    active_workspace_id: user.active_workspace_id,
-    name: user.name,
-    email: user.email,
-    app_metadata: {},
-    user_metadata: {},
-    aud: '',
-    created_at: '',
-  };
+// Helper to cast session.user to AuthUser
+function getAuthUser(session: any): AuthUser | null {
+  if (!session?.user?.id || !session.user.active_workspace_id) return null;
+  return session.user as AuthUser;
 }
 
+// GET handler to fetch tasks for the authenticated user
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
-  const user = session?.user;
-  // Only check for user existence, not id/workspace_id, since those are added by sessionUserToAuthUser
+  const user = getAuthUser(session);
   if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return new NextResponse('Unauthorized', { status: 401 });
   }
   try {
-    const authUser = sessionUserToAuthUser(user);
-    if (!authUser.id || !authUser.active_workspace_id) {
-      return NextResponse.json({ error: 'User context incomplete' }, { status: 400 });
-    }
-    const tasks = await dbTaskService.getTasks(authUser);
+    const tasks = await dbTaskService.getTasks(user);
     return NextResponse.json(tasks);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (error) {
+    return new NextResponse('Failed to fetch tasks from the database.', { status: 500 });
   }
 }
 
+// POST handler to create a new task for the authenticated user
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
-  const user = session?.user;
+  const user = getAuthUser(session);
   if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return new NextResponse('Unauthorized', { status: 401 });
   }
   try {
-    const authUser = sessionUserToAuthUser(user);
-    if (!authUser.id || !authUser.active_workspace_id) {
-      return NextResponse.json({ error: 'User context incomplete' }, { status: 400 });
-    }
     const body = await request.json();
-    const newTask = await dbTaskService.createTask(body, authUser);
-    return NextResponse.json(newTask, { status: 201 });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    const createdTask = await dbTaskService.createTask(body, user);
+    return NextResponse.json(createdTask, { status: 201 });
+  } catch (error) {
+    return new NextResponse('Failed to create the task in the database.', { status: 500 });
   }
 }
